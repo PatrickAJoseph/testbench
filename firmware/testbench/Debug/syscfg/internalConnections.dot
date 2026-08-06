@@ -1,0 +1,122 @@
+digraph {
+    graph [fontname = "helvetica"];
+    node  [fontname = "helvetica" margin="0.2"];
+    edge  [fontname = "helvetica" fontsize=10 labeldistance="1.5"];
+    graph [mclimit=50 rankdir=LR];
+
+        node [shape=cds style=filled fillcolor="#A0FFA0"];
+            PA2
+            PA25
+            PB3
+            PA7
+            PB1
+            PB2
+
+        node [shape=rectangle style=filled fillcolor="#FFA0A0"];
+            INPUTXBAR1 [label="INPUTXBAR1\n(CAPTURE_INPUTXBAR1)"]
+            INPUTXBAR2 [label="INPUTXBAR2\n(CAPTURE_INPUTXBAR2)"]
+
+        node [shape=oval style=filled fillcolor="#FFA0A0"];
+
+        node [shape=triangle style=filled orientation=-90 fillcolor="#A0A0FF"];
+
+        node [shape=rectangle style=filled orientation=-90 fillcolor="#FFFFA0"];
+            ECAP0_INT [label="ECAP0_INT\n(CEVT3)"]
+            ECAP1_INT [label="ECAP1_INT\n(CEVT3)"]
+
+        node [shape=rectangle style=filled fillcolor="#A0A0FF"];
+            ECAP0_IN
+            INPUTXBAR1
+            ECAP0_SYNCOUT [label="ECAP0_SYNCOUT\n(SYNCI)"]
+            ECAP0_INT
+            ECAP1_IN
+            INPUTXBAR2
+            ECAP1_SYNCOUT [label="ECAP1_SYNCOUT\n(SYNCI)"]
+            ECAP1_INT
+            PWM0_1A
+            PWM0_DB_1A
+            PWM0_AQ_1A [label="PWM0_AQ_1A\n(Zero:HIGH\nCountUpCmpA:LOW)"]
+            PWM4_1B
+            PWM4_DB_1B
+            PWM4_AQ_1B [label="PWM4_AQ_1B\n(Zero:HIGH\nCountUpCmpB:LOW)"]
+            PWM3_3A
+            PWM3_DB_3A
+            PWM3_AQ_3A [label="PWM3_AQ_3A\n(Zero:HIGH\nCountUpCmpA:LOW)"]
+            PWM2_2A
+            PWM2_DB_2A
+            PWM2_AQ_2A [label="PWM2_AQ_2A\n(Zero:HIGH\nCountUpCmpA:LOW)"]
+
+        INPUTXBAR1 -> ECAP0_IN
+        INPUTXBAR2 -> ECAP1_IN
+        PA2 -> INPUTXBAR1
+        CAPTURE_CH0_DIN -> PA2 [dir=none]
+        PA25 -> INPUTXBAR2
+        CAPTURE_CH1_DIN -> PA25 [dir=none]
+        PWM0_DB_1A -> PWM0_1A
+        PWM0_1A -> PB3
+        PWM0_AQ_1A -> PWM0_DB_1A
+        PWM4_DB_1B -> PWM4_1B
+        PWM4_1B -> PA7
+        PWM4_AQ_1B -> PWM4_DB_1B
+        PWM3_DB_3A -> PWM3_3A
+        PWM3_3A -> PB1
+        PWM3_AQ_3A -> PWM3_DB_3A
+        PWM2_DB_2A -> PWM2_2A
+        PWM2_2A -> PB2
+        PWM2_AQ_2A -> PWM2_DB_2A
+
+        subgraph cluster_ECAP0_ {
+            margin=10 style=invis
+            subgraph cluster_ECAP0 {
+                label = "ECAP0\n(CAPTURE_ECAP0)\nCAPTURE"
+                style=filled
+                
+                ECAP0_IN ECAP0_SYNCOUT ECAP0_INT
+            }
+        }
+        subgraph cluster_ECAP1_ {
+            margin=10 style=invis
+            subgraph cluster_ECAP1 {
+                label = "ECAP1\n(CAPTURE_ECAP1)\nCAPTURE"
+                style=filled
+                
+                ECAP1_IN ECAP1_SYNCOUT ECAP1_INT
+            }
+        }
+        subgraph cluster_PWM0_ {
+            margin=10 style=invis
+            subgraph cluster_PWM0 {
+                label = "PWM0\n(PWM_CH0)\nTB Freq=200.00 MHz, PWM Freq=20.00 kHz"
+                style=filled
+                
+                PWM0_1A PWM0_DB_1A PWM0_AQ_1A
+            }
+        }
+        subgraph cluster_PWM4_ {
+            margin=10 style=invis
+            subgraph cluster_PWM4 {
+                label = "PWM4\n(PWM_CH1)\nTB Freq=200.00 MHz, PWM Freq=200.00 MHz"
+                style=filled
+                
+                PWM4_1B PWM4_DB_1B PWM4_AQ_1B
+            }
+        }
+        subgraph cluster_PWM3_ {
+            margin=10 style=invis
+            subgraph cluster_PWM3 {
+                label = "PWM3\n(PWM_CH2)\nTB Freq=200.00 MHz, PWM Freq=200.00 MHz"
+                style=filled
+                
+                PWM3_3A PWM3_DB_3A PWM3_AQ_3A
+            }
+        }
+        subgraph cluster_PWM2_ {
+            margin=10 style=invis
+            subgraph cluster_PWM2 {
+                label = "PWM2\n(PWM_CH3)\nTB Freq=200.00 MHz, PWM Freq=200.00 MHz"
+                style=filled
+                
+                PWM2_2A PWM2_DB_2A PWM2_AQ_2A
+            }
+        }
+}

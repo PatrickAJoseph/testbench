@@ -1,0 +1,14 @@
+"./capture.o"
+"./clocks.o"
+"./syscfg/ti_sdk_dl_config.o"
+"./main.o"
+"./protocol.o"
+"./protocol_app_interface.o"
+"./pwm.o"
+"./user_uart.o"
+"../linker_m33_ti_arm_clang.cmd"
+-llibti_sdk_cfg_default_m33_ti_arm_clang.a
+-llibarch_ti_sdk_cfg_default_m33_ti_arm_clang.a
+-llibdriverlib_ti_sdk_cfg_default_m33_ti_arm_clang.a
+-llibutils_nortos_ti_sdk_cfg_default_m33_ti_arm_clang.a
+-llibam13e230x_m33_ti_arm_clang.a
