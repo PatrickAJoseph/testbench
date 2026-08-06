@@ -15,6 +15,7 @@ C_SRCS += \
 ../capture.c \
 ../clocks.c \
 ./syscfg/ti_sdk_dl_config.c \
+../hsadc.c \
 ../main.c \
 ../protocol.c \
 ../protocol_app_interface.c \
@@ -31,6 +32,7 @@ C_DEPS += \
 ./capture.d \
 ./clocks.d \
 ./syscfg/ti_sdk_dl_config.d \
+./hsadc.d \
 ./main.d \
 ./protocol.d \
 ./protocol_app_interface.d \
@@ -41,6 +43,7 @@ OBJS += \
 ./capture.o \
 ./clocks.o \
 ./syscfg/ti_sdk_dl_config.o \
+./hsadc.o \
 ./main.o \
 ./protocol.o \
 ./protocol_app_interface.o \
@@ -58,6 +61,7 @@ OBJS__QUOTED += \
 "capture.o" \
 "clocks.o" \
 "syscfg\ti_sdk_dl_config.o" \
+"hsadc.o" \
 "main.o" \
 "protocol.o" \
 "protocol_app_interface.o" \
@@ -72,6 +76,7 @@ C_DEPS__QUOTED += \
 "capture.d" \
 "clocks.d" \
 "syscfg\ti_sdk_dl_config.d" \
+"hsadc.d" \
 "main.d" \
 "protocol.d" \
 "protocol_app_interface.d" \
@@ -85,6 +90,7 @@ C_SRCS__QUOTED += \
 "../capture.c" \
 "../clocks.c" \
 "./syscfg/ti_sdk_dl_config.c" \
+"../hsadc.c" \
 "../main.c" \
 "../protocol.c" \
 "../protocol_app_interface.c" \

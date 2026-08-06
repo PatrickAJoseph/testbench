@@ -73,6 +73,8 @@ void PWM_init()
     pwm_configure( &pwm_channels[1], 1000, 0.0f );
     pwm_configure( &pwm_channels[2], 1000, 0.0f );
     pwm_configure( &pwm_channels[3], 1000, 0.0f ); 
+
+    DL_MCPWM_enableTBCLK();
 }
 
 extern void PWM_enable(int channel)

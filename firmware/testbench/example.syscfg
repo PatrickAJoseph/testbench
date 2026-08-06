@@ -41,17 +41,19 @@ const uart2      = uart.addInstance();
  * Write custom configuration values to the imported modules.
  */
 adc1.$name                   = "HSADC";
-adc1.numberOfSOCs            = 2;
 adc1.enableSEQs              = true;
-adc1.numberOfSEQs            = 1;
 adc1.interruptPulseMode      = "DL_ADC_PULSE_END_OF_CONV";
 adc1.enabledDMAInts          = ["DMAINT1"];
-adc1.SOC0.channel            = "PA17";
-adc1.SOC1.channel            = "PA16";
-adc1.SEQ1.triggerSel         = "DL_ADC_TRIGGER_PWM1_SOCA";
-adc1.SEQ1.name               = "SEQ0";
+adc1.numberOfSOCs            = 2;
+adc1.numberOfSEQs            = 1;
 adc1.DMAINT1.enableInterrupt = true;
 adc1.DMAINT1.continuousMode  = true;
+adc1.DMAINT1.SOCSource       = "SOC1";
+adc1.SOC0.channel            = "PA16";
+adc1.SOC1.channel            = "PA17";
+adc1.SEQ1.name               = "SEQ0";
+adc1.SEQ1.triggerSel         = "DL_ADC_TRIGGER_PWM1_SOCA";
+adc1.SEQ1.numberOfSOCs       = 2;
 
 dma.registerIntDMA0 = true;
 
@@ -175,30 +177,33 @@ mcpwm4.actionQualifier.PWM2A.actionAtCountUpCmpA = "DL_MCPWM_AQ_OUTPUT_LOW";
 mcpwm4.loadMode.$name                            = "drivers_mcpwm_v0_mcpwm_loadMode3";
 mcpwm4.peripheral["2A"].$assign                  = "PB2";
 
-mcpwm5.$name                         = "HSADC_TRIGGER_PWM";
-mcpwm5.mcpwmBase                     = "MCPWM1";
-mcpwm5.pinList                       = ["1A"];
-mcpwm5.enablePWM1B                   = false;
-mcpwm5.enablePWM2A                   = false;
-mcpwm5.enablePWM2B                   = false;
-mcpwm5.enablePWM3A                   = false;
-mcpwm5.enablePWM3B                   = false;
-mcpwm5.enableEventTrigger            = true;
-mcpwm5.timeBase.$name                = "drivers_mcpwm_v0_mcpwm_timeBase4";
-mcpwm5.timeBase.counterMode          = "DL_MCPWM_COUNTER_MODE_UP";
-mcpwm5.timeBase.periodValue          = 9999;
-mcpwm5.timeBase.emulationMode        = "DL_MCPWM_EMULATION_FREE_RUN";
-mcpwm5.counterCompare.$name          = "drivers_mcpwm_v0_mcpwm_counterCompare4";
-mcpwm5.actionQualifier.$name         = "drivers_mcpwm_v0_mcpwm_actionQualifier4";
-mcpwm5.actionQualifier.PWM1A.$name   = "drivers_mcpwm_v0_mcpwm_actionQualifierEvents1";
-mcpwm5.loadMode.$name                = "drivers_mcpwm_v0_mcpwm_loadMode4";
-mcpwm5.eventTrigger.$name            = "drivers_mcpwm_v0_mcpwm_eventTrigger0";
-mcpwm5.eventTrigger.SOCA_enable      = true;
-mcpwm5.eventTrigger.SOCA_eventSource = "DL_MCPWM_SOC_TBCTR_ZERO";
+mcpwm5.$name                                     = "HSADC_TRIGGER_PWM";
+mcpwm5.mcpwmBase                                 = "MCPWM1";
+mcpwm5.pinList                                   = ["1A"];
+mcpwm5.enablePWM1B                               = false;
+mcpwm5.enablePWM2A                               = false;
+mcpwm5.enablePWM2B                               = false;
+mcpwm5.enablePWM3A                               = false;
+mcpwm5.enablePWM3B                               = false;
+mcpwm5.enableEventTrigger                        = true;
+mcpwm5.timeBase.$name                            = "drivers_mcpwm_v0_mcpwm_timeBase4";
+mcpwm5.timeBase.counterMode                      = "DL_MCPWM_COUNTER_MODE_UP";
+mcpwm5.timeBase.periodValue                      = 9999;
+mcpwm5.timeBase.emulationMode                    = "DL_MCPWM_EMULATION_FREE_RUN";
+mcpwm5.counterCompare.$name                      = "drivers_mcpwm_v0_mcpwm_counterCompare4";
+mcpwm5.actionQualifier.$name                     = "drivers_mcpwm_v0_mcpwm_actionQualifier4";
+mcpwm5.actionQualifier.PWM1A.$name               = "drivers_mcpwm_v0_mcpwm_actionQualifierEvents1";
+mcpwm5.actionQualifier.PWM1A.actionAtZero        = "DL_MCPWM_AQ_OUTPUT_HIGH";
+mcpwm5.actionQualifier.PWM1A.actionAtCountUpCmpA = "DL_MCPWM_AQ_OUTPUT_LOW";
+mcpwm5.loadMode.$name                            = "drivers_mcpwm_v0_mcpwm_loadMode4";
+mcpwm5.eventTrigger.$name                        = "drivers_mcpwm_v0_mcpwm_eventTrigger0";
+mcpwm5.eventTrigger.SOCA_enable                  = true;
+mcpwm5.eventTrigger.SOCA_eventSource             = "DL_MCPWM_SOC_TBCTR_ZERO";
 
 sysctl.useHFCLK     = true;
 sysctl.SYSPLLSource = "DL_SYSCTL_SYSPLL_REF_HFCLK";
 sysctl.SYSPLL_Qdiv  = 32;
+sysctl.VREFSource   = "DL_SYSCTL_VREF_INTERNAL_3_3_V";
 
 systick.periodEnable    = true;
 systick.period          = 16777216;
@@ -242,9 +247,9 @@ uart2.rxPinConfig.passedPeripheralType = scripting.forceWrite("Digital");
  * re-solve from scratch.
  */
 adc1.SOC0.peripheral.$suggestSolution        = "ANALOG";
-adc1.SOC0.peripheral.AIN17.$suggestSolution  = "PA17";
+adc1.SOC0.peripheral.AIN16.$suggestSolution  = "PA16";
 adc1.SOC1.peripheral.$suggestSolution        = "ANALOG";
-adc1.SOC1.peripheral.AIN16.$suggestSolution  = "PA16";
+adc1.SOC1.peripheral.AIN17.$suggestSolution  = "PA17";
 gpio1.associatedPins[0].pin.$suggestSolution = "PA2";
 mcpwm1.peripheral.$suggestSolution           = "MCPWM0";
 mcpwm3.peripheral.$suggestSolution           = "MCPWM3";

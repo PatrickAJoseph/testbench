@@ -6,6 +6,8 @@
 #include "user_uart.h"
 #include "capture.h"
 #include "pwm.h"
+#include "hsadc.h"
+
 #include "protocol_app_interface.h"
 
 int main()
@@ -17,10 +19,9 @@ int main()
     UART_init();
     Capture_init();
     PWM_init();
+    HSADC_init();
 
     protocol_app_interface_init();
-
-    DL_MCPWM_enableTBCLK();
 
     while(1)
     {

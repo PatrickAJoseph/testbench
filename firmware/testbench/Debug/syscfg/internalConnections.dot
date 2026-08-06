@@ -5,12 +5,15 @@ digraph {
     graph [mclimit=50 rankdir=LR];
 
         node [shape=cds style=filled fillcolor="#A0FFA0"];
+            PA16
+            PA17
             PA2
             PA25
             PB3
             PA7
             PB1
             PB2
+            PA15
 
         node [shape=rectangle style=filled fillcolor="#FFA0A0"];
             INPUTXBAR1 [label="INPUTXBAR1\n(CAPTURE_INPUTXBAR1)"]
@@ -21,10 +24,16 @@ digraph {
         node [shape=triangle style=filled orientation=-90 fillcolor="#A0A0FF"];
 
         node [shape=rectangle style=filled orientation=-90 fillcolor="#FFFFA0"];
+            ADC0_DMAINT1
             ECAP0_INT [label="ECAP0_INT\n(CEVT3)"]
             ECAP1_INT [label="ECAP1_INT\n(CEVT3)"]
 
         node [shape=rectangle style=filled fillcolor="#A0A0FF"];
+            ADC0_SOC0
+            ADC0_SOC1
+            ADC0_SEQ1 [label="ADC0_SEQ1\n(SOC0->SOC1)"]
+            PWM1_SOCA
+            ADC0_DMAINT1
             ECAP0_IN
             INPUTXBAR1
             ECAP0_SYNCOUT [label="ECAP0_SYNCOUT\n(SYNCI)"]
@@ -45,7 +54,15 @@ digraph {
             PWM2_2A
             PWM2_DB_2A
             PWM2_AQ_2A [label="PWM2_AQ_2A\n(Zero:HIGH\nCountUpCmpA:LOW)"]
+            PWM1_1A
+            PWM1_DB_1A
+            PWM1_AQ_1A [label="PWM1_AQ_1A\n(Zero:HIGH\nCountUpCmpA:LOW)"]
+            PWM1_SOCA [label="PWM1_SOCA\n(TBCTR=ZERO)"]
 
+        PA16 -> ADC0_SOC0
+        PA17 -> ADC0_SOC1
+        PWM1_SOCA -> ADC0_SEQ1 [label="Trigger"]
+        ADC0_SOC1 -> ADC0_DMAINT1
         INPUTXBAR1 -> ECAP0_IN
         INPUTXBAR2 -> ECAP1_IN
         PA2 -> INPUTXBAR1
@@ -64,7 +81,28 @@ digraph {
         PWM2_DB_2A -> PWM2_2A
         PWM2_2A -> PB2
         PWM2_AQ_2A -> PWM2_DB_2A
+        PWM1_DB_1A -> PWM1_1A
+        PWM1_1A -> PA15
+        PWM1_AQ_1A -> PWM1_DB_1A
 
+        subgraph cluster_ADC0_ {
+            margin=10 style=invis
+            subgraph cluster_ADC0 {
+                label = "ADC0\n(HSADC)"
+                style=filled
+                
+                ADC0_SOC0 ADC0_SOC1 ADC0_SEQ1 ADC0_DMAINT1
+            }
+        }
+        subgraph cluster_PWM1_ {
+            margin=10 style=invis
+            subgraph cluster_PWM1 {
+                label = "PWM1\n(HSADC_TRIGGER_PWM)\nTB Freq=200.00 MHz, PWM Freq=20.00 kHz"
+                style=filled
+                
+                PWM1_SOCA PWM1_1A PWM1_DB_1A PWM1_AQ_1A PWM1_SOCA
+            }
+        }
         subgraph cluster_ECAP0_ {
             margin=10 style=invis
             subgraph cluster_ECAP0 {

@@ -1,6 +1,7 @@
 "./capture.o"
 "./clocks.o"
 "./syscfg/ti_sdk_dl_config.o"
+"./hsadc.o"
 "./main.o"
 "./protocol.o"
 "./protocol_app_interface.o"

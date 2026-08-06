@@ -99,6 +99,24 @@ delayed. Please refer to the function documentation for more details.
 
 
 
+#define HSADC_DMA_DMA_INST                      DMA0
+#define HSADC_DMA_CHANNEL_ID                    0
+#define HSADC_DMA_CHANNEL_INTERRUPT_MASK        DL_DMA_FULL_TRANSFER_COMPLETE_INTERRUPT_MASK(0)
+#define HSADC_DMA_CHANNEL_EARLY_INTERRUPT_MASK  DL_DMA_HALF_TRANSFER_COMPLETE_INTERRUPT_MASK(0)
+
+
+#define HSADC_INST                                                           ADC0
+#define HSADC_BASE                                                      ADC0_BASE
+#define HSADC_RESULT_INST                                              ADC0RESULT
+#define HSADC_RESULT_BASE                                         ADC0RESULT_BASE
+#define HSADC_SOC0                                             DL_ADC_SOC_NUMBER0
+#define HSADC_CHANNEL_SOC0                                      DL_ADC_CH_ADCIN15
+#define HSADC_SOC1                                             DL_ADC_SOC_NUMBER1
+#define HSADC_CHANNEL_SOC1                                      DL_ADC_CH_ADCIN12
+#define HSADC_SEQ0                                             DL_ADC_SEQ_NUMBER1
+
+
+
 /* Defines for CAPTURE_ECAP0 */
 #define CAPTURE_ECAP0_INST                                                 ECAP0
 #define CAPTURE_ECAP0_BASE                                            ECAP0_BASE
@@ -160,6 +178,19 @@ delayed. Please refer to the function documentation for more details.
 #define PWM_CH3_PWM3_CMPB                                                      0
 #define PWM_CH3_CMPC                                                           0
 #define PWM_CH3_CMPD                                                           0
+/* Defines for HSADC_TRIGGER_PWM */
+#define HSADC_TRIGGER_PWM_INST                                            MCPWM1
+#define HSADC_TRIGGER_PWM_BASE                                       MCPWM1_BASE
+#define HSADC_TRIGGER_PWM_PERIOD                                            9999
+#define HSADC_TRIGGER_PWM_TBPHS                                                0
+#define HSADC_TRIGGER_PWM_PWM1_CMPA                                            0
+#define HSADC_TRIGGER_PWM_PWM1_CMPB                                            0
+#define HSADC_TRIGGER_PWM_PWM2_CMPA                                            0
+#define HSADC_TRIGGER_PWM_PWM2_CMPB                                            0
+#define HSADC_TRIGGER_PWM_PWM3_CMPA                                            0
+#define HSADC_TRIGGER_PWM_PWM3_CMPB                                            0
+#define HSADC_TRIGGER_PWM_CMPC                                                 0
+#define HSADC_TRIGGER_PWM_CMPD                                                 0
 
 
 
@@ -197,6 +228,8 @@ delayed. Please refer to the function documentation for more details.
 
 
 /* Interrupt Defines */
+#define DMA0_INT                                                    DMA0_INT_IRQn
+#define DMA0_INT_Handler                                          DMA0_IRQHandler
 #define CAPTURE_ECAP0_INT                                          ECAP0_INT_IRQn
 #define CAPTURE_ECAP0_INT_Handler                                ECAP0_IRQHandler
 #define Systick_INT                                                  SysTick_IRQn
@@ -209,12 +242,15 @@ void SYSCFG_DL_SYSCTL_CLK_init(void);
 void SYSCFG_DL_SYSCTL_init(void);
 
 void SYSCFG_DL_INPUTXBAR_init(void);
+void SYSCFG_DL_DMA0_init(void);
+void SYSCFG_DL_HSADC_init(void);
 void SYSCFG_DL_CAPTURE_ECAP0_init(void);
 void SYSCFG_DL_CAPTURE_ECAP1_init(void);
 void SYSCFG_DL_PWM_CH0_init(void);
 void SYSCFG_DL_PWM_CH1_init(void);
 void SYSCFG_DL_PWM_CH2_init(void);
 void SYSCFG_DL_PWM_CH3_init(void);
+void SYSCFG_DL_HSADC_TRIGGER_PWM_init(void);
 void SYSCFG_DL_RS485_UART_init(void);
 void SYSCFG_DL_USER_UART_init(void);
 void SYSCFG_DL_SYSTICK_init(void);
