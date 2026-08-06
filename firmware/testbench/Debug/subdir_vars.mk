@@ -20,6 +20,7 @@ C_SRCS += \
 ../protocol.c \
 ../protocol_app_interface.c \
 ../pwm.c \
+../user_spi.c \
 ../user_uart.c 
 
 GEN_FILES += \
@@ -37,6 +38,7 @@ C_DEPS += \
 ./protocol.d \
 ./protocol_app_interface.d \
 ./pwm.d \
+./user_spi.d \
 ./user_uart.d 
 
 OBJS += \
@@ -48,6 +50,7 @@ OBJS += \
 ./protocol.o \
 ./protocol_app_interface.o \
 ./pwm.o \
+./user_spi.o \
 ./user_uart.o 
 
 GEN_MISC_FILES += \
@@ -66,6 +69,7 @@ OBJS__QUOTED += \
 "protocol.o" \
 "protocol_app_interface.o" \
 "pwm.o" \
+"user_spi.o" \
 "user_uart.o" 
 
 GEN_MISC_FILES__QUOTED += \
@@ -81,6 +85,7 @@ C_DEPS__QUOTED += \
 "protocol.d" \
 "protocol_app_interface.d" \
 "pwm.d" \
+"user_spi.d" \
 "user_uart.d" 
 
 GEN_FILES__QUOTED += \
@@ -95,6 +100,7 @@ C_SRCS__QUOTED += \
 "../protocol.c" \
 "../protocol_app_interface.c" \
 "../pwm.c" \
+"../user_spi.c" \
 "../user_uart.c" 
 
 SYSCFG_SRCS__QUOTED += \

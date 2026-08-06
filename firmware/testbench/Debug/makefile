@@ -18,6 +18,7 @@ ORDERED_OBJS += \
 "./protocol.o" \
 "./protocol_app_interface.o" \
 "./pwm.o" \
+"./user_spi.o" \
 "./user_uart.o" \
 "../linker_m33_ti_arm_clang.cmd" \
 $(GEN_CMDS__FLAG) \
@@ -146,8 +147,8 @@ testbench.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 # Other Targets
 clean:
 	-$(RM) $(GEN_MISC_FILES__QUOTED)$(GEN_FILES__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "capture.o" "clocks.o" "syscfg\ti_sdk_dl_config.o" "hsadc.o" "main.o" "protocol.o" "protocol_app_interface.o" "pwm.o" "user_uart.o" 
-	-$(RM) "capture.d" "clocks.d" "syscfg\ti_sdk_dl_config.d" "hsadc.d" "main.d" "protocol.d" "protocol_app_interface.d" "pwm.d" "user_uart.d" 
+	-$(RM) "capture.o" "clocks.o" "syscfg\ti_sdk_dl_config.o" "hsadc.o" "main.o" "protocol.o" "protocol_app_interface.o" "pwm.o" "user_spi.o" "user_uart.o" 
+	-$(RM) "capture.d" "clocks.d" "syscfg\ti_sdk_dl_config.d" "hsadc.d" "main.d" "protocol.d" "protocol_app_interface.d" "pwm.d" "user_spi.d" "user_uart.d" 
 	-$(RMDIR) $(GEN_MISC_DIRS__QUOTED)
 	-@echo ' '
 

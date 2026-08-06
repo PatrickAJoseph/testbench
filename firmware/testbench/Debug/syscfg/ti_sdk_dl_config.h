@@ -90,6 +90,16 @@ delayed. Please refer to the function documentation for more details.
 /* Defines for CAPTURE_CH1_DIN: GPIO0.25 with pinCMx PA25 on package pin 62 */
 #define CAPTURE_DIN_GPIO_GROUP_CAPTURE_CH1_DIN_PIN             (DL_GPIO_PIN(25))
 #define CAPTURE_DIN_GPIO_GROUP_CAPTURE_CH1_DIN_IOMUX          (IOMUX_PINCM_PA25)
+/* Port definition for Pin Group SPI_GPIO_GROUP */
+#define SPI_GPIO_GROUP_PORT                                              (GPIO1)
+#define SPI_GPIO_GROUP_PORT_BASE                                    (GPIO1_BASE)
+
+/* Defines for SPI_CS_USER_0: GPIO1.12 with pinCMx PB12 on package pin 54 */
+#define SPI_GPIO_GROUP_SPI_CS_USER_0_PIN                       (DL_GPIO_PIN(12))
+#define SPI_GPIO_GROUP_SPI_CS_USER_0_IOMUX                    (IOMUX_PINCM_PB12)
+/* Defines for SPI_CS_IOEXP: GPIO1.11 with pinCMx PB11 on package pin 53 */
+#define SPI_GPIO_GROUP_SPI_CS_IOEXP_PIN                        (DL_GPIO_PIN(11))
+#define SPI_GPIO_GROUP_SPI_CS_IOEXP_IOMUX                     (IOMUX_PINCM_PB11)
 
 
 /* Defines for CAPTURE_INPUTXBAR1 */
@@ -225,6 +235,23 @@ delayed. Please refer to the function documentation for more details.
 
 
 
+/* Defines for SPI_COMMON */
+#define SPI_COMMON_INST                                            UC3_INST_PTR
+#define GPIO_SPI_COMMON_PICO_PORT                                         GPIO1
+#define GPIO_SPI_COMMON_PICO_PIN                                 DL_GPIO_PIN_10
+#define GPIO_SPI_COMMON_IOMUX_PICO                           (IOMUX_PINCM_PB10)
+#define GPIO_SPI_COMMON_IOMUX_PICO_FUNC              IOMUX_PB10_UC3_TX_SDA_PICO
+#define GPIO_SPI_COMMON_POCI_PORT                                         GPIO0
+#define GPIO_SPI_COMMON_POCI_PIN                                 DL_GPIO_PIN_20
+#define GPIO_SPI_COMMON_IOMUX_POCI                           (IOMUX_PINCM_PA20)
+#define GPIO_SPI_COMMON_IOMUX_POCI_FUNC                 IOMUX_PA20_UC3_RTS_POCI
+/* GPIO configuration for SPI_COMMON */
+#define GPIO_SPI_COMMON_SCLK_PORT                                         GPIO1
+#define GPIO_SPI_COMMON_SCLK_PIN                                 DL_GPIO_PIN_18
+#define GPIO_SPI_COMMON_IOMUX_SCLK                           (IOMUX_PINCM_PB18)
+#define GPIO_SPI_COMMON_IOMUX_SCLK_FUNC              IOMUX_PB18_UC3_RX_SCL_SCLK
+
+
 
 
 /* Interrupt Defines */
@@ -255,6 +282,7 @@ void SYSCFG_DL_PWM_CH3_init(void);
 void SYSCFG_DL_HSADC_TRIGGER_PWM_init(void);
 void SYSCFG_DL_RS485_UART_init(void);
 void SYSCFG_DL_USER_UART_init(void);
+void SYSCFG_DL_SPI_COMMON_init(void);
 void SYSCFG_DL_SYSTICK_init(void);
 void SYSCFG_DL_INTERRUPT_init(void);
 

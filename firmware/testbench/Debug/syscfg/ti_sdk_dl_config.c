@@ -60,6 +60,7 @@ SYSCONFIG_WEAK void SYSCFG_DL_init(void)
     SYSCFG_DL_HSADC_TRIGGER_PWM_init();
     SYSCFG_DL_RS485_UART_init();
     SYSCFG_DL_USER_UART_init();
+    SYSCFG_DL_SPI_COMMON_init();
     SYSCFG_DL_SYSTICK_init();
     SYSCFG_DL_INTERRUPT_init();
 }
@@ -84,6 +85,7 @@ SYSCONFIG_WEAK void SYSCFG_DL_initPower(void)
     DL_SYSCTL_resetPeripheral(DL_SYSCTL_RESET_PWM1);
     DL_UART_reset(RS485_UART_INST);
     DL_UART_reset(USER_UART_INST);
+    DL_SPI_reset(SPI_COMMON_INST);
 
 
     DL_GPIO_enablePower(GPIO0);
@@ -103,6 +105,7 @@ SYSCONFIG_WEAK void SYSCFG_DL_initPower(void)
     DL_SYSCTL_enablePower(DL_SYSCTL_PWREN_PWM1);
     DL_UART_enablePower(RS485_UART_INST);
     DL_UART_enablePower(USER_UART_INST);
+    DL_SPI_enablePower(SPI_COMMON_INST);
 
 }
 
@@ -115,6 +118,14 @@ SYSCONFIG_WEAK void SYSCFG_DL_Pinmux_init(void)
 
     DL_GPIO_initDigitalInput(CAPTURE_DIN_GPIO_GROUP_CAPTURE_CH1_DIN_IOMUX);
 
+    DL_GPIO_initDigitalOutput(SPI_GPIO_GROUP_SPI_CS_USER_0_IOMUX);
+
+    DL_GPIO_initDigitalOutput(SPI_GPIO_GROUP_SPI_CS_IOEXP_IOMUX);
+
+    DL_GPIO_clearPins(SPI_GPIO_GROUP_PORT, SPI_GPIO_GROUP_SPI_CS_USER_0_PIN |
+		SPI_GPIO_GROUP_SPI_CS_IOEXP_PIN);
+    DL_GPIO_enableOutput(SPI_GPIO_GROUP_PORT, SPI_GPIO_GROUP_SPI_CS_USER_0_PIN |
+		SPI_GPIO_GROUP_SPI_CS_IOEXP_PIN);
 
 
     // IOMUX Setting for MCPWM pins are done after the module initialization.
@@ -128,6 +139,13 @@ SYSCONFIG_WEAK void SYSCFG_DL_Pinmux_init(void)
         GPIO_USER_UART_IOMUX_TX, GPIO_USER_UART_IOMUX_TX_FUNC);
     DL_GPIO_initPeripheralInputFunction(
         GPIO_USER_UART_IOMUX_RX, GPIO_USER_UART_IOMUX_RX_FUNC);
+
+    DL_GPIO_initPeripheralOutputFunction(
+        GPIO_SPI_COMMON_IOMUX_SCLK, GPIO_SPI_COMMON_IOMUX_SCLK_FUNC);
+    DL_GPIO_initPeripheralOutputFunction(
+        GPIO_SPI_COMMON_IOMUX_PICO, GPIO_SPI_COMMON_IOMUX_PICO_FUNC);
+    DL_GPIO_initPeripheralInputFunction(
+        GPIO_SPI_COMMON_IOMUX_POCI, GPIO_SPI_COMMON_IOMUX_POCI_FUNC);
 
     DL_GPIO_initPeripheralAnalogFunction(IOMUX_PINCM_PA16);
     DL_GPIO_initPeripheralAnalogFunction(IOMUX_PINCM_PA17);
@@ -817,6 +835,38 @@ SYSCONFIG_WEAK void SYSCFG_DL_USER_UART_init(void)
     DL_UART_setTXFIFOThreshold(USER_UART_INST, DL_UART_TX_FIFO_LEVEL_NOT_FULL);
 
     DL_UART_enable(USER_UART_INST);
+}
+
+static const DL_SPI_Config gSPI_COMMON_config = {
+    .mode        = DL_SPI_MODE_CONTROLLER,
+    .frameFormat = DL_SPI_FRAME_FORMAT_MOTO3_POL0_PHA0,
+    .parity      = DL_SPI_PARITY_NONE,
+    .dataSize    = DL_SPI_DATA_SIZE_8,
+    .bitOrder    = DL_SPI_BIT_ORDER_MSB_FIRST,
+};
+
+static const DL_SPI_ClockConfig gSPI_COMMON_clockConfig = {
+    .clockSel    = DL_SPI_CLOCK_BUSCLK,
+    .divideRatio = DL_SPI_CLOCK_DIVIDE_RATIO_1
+};
+
+SYSCONFIG_WEAK void SYSCFG_DL_SPI_COMMON_init(void) {
+    DL_SPI_setClockConfig(SPI_COMMON_INST, (DL_SPI_ClockConfig *) &gSPI_COMMON_clockConfig);
+
+    DL_SPI_init(SPI_COMMON_INST, (DL_SPI_Config *) &gSPI_COMMON_config);
+
+    /* Configure Controller mode */
+    /*
+     * Set the bit rate clock divider to generate the serial output clock
+     *     outputBitRate = (spiInputClock) / ((1 + SCR) * 2)
+     *     100000 = (100.00 MHz)/((1 + 499) * 2)
+     */
+    DL_SPI_setBitRateSerialClockDivider(SPI_COMMON_INST, 499);
+    /* Set RX and TX FIFO threshold levels */
+    DL_SPI_setFIFOThreshold(SPI_COMMON_INST, DL_SPI_RX_FIFO_LEVEL_NOT_EMPTY, DL_SPI_TX_FIFO_LEVEL_EMPTY);
+
+    /* Enable module */
+    DL_SPI_enable(SPI_COMMON_INST);
 }
 
 SYSCONFIG_WEAK void SYSCFG_DL_SYSTICK_init(void)

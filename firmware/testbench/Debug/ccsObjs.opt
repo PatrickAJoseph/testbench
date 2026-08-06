@@ -6,6 +6,7 @@
 "./protocol.o"
 "./protocol_app_interface.o"
 "./pwm.o"
+"./user_spi.o"
 "./user_uart.o"
 "../linker_m33_ti_arm_clang.cmd"
 -llibti_sdk_cfg_default_m33_ti_arm_clang.a
