@@ -213,6 +213,7 @@ systick.registerInt     = true;
 uart1.$name                            = "RS485_UART";
 uart1.targetBaudRate                   = 115200;
 uart1.enabledInterrupts                = ["DL_UART_INTERRUPT_FRAMING_ERROR","DL_UART_INTERRUPT_OVERRUN_ERROR","DL_UART_INTERRUPT_PARITY_ERROR","DL_UART_INTERRUPT_RX"];
+uart1.registerInterrupt                = true;
 uart1.peripheral.$assign               = "UC4";
 uart1.txPinConfig.$name                = "drivers_gpio_v0_gpioPinConfig0";
 uart1.txPinConfig.direction            = scripting.forceWrite("OUTPUT");

@@ -1,0 +1,507 @@
+commands:
+  ping_device:
+    id: 0x01
+
+    request:
+      fields:
+        - name: reset_ping_counter
+          type: uint8
+          is_a_list: false
+
+        - name: ping_counter_value
+          type: uint32
+          is_a_list: false
+
+    response:
+      fields:
+        - name: ping_counter_value
+          type: uint32
+          is_a_list: false
+    
+  get_device_info:
+    id: 0x02
+
+    request:
+      fields:
+        - name: info_request_len
+          type: uint8
+          is_a_list: false
+        - name: info_request_string
+          type: string
+          is_a_list: false
+      
+    response:
+      fields:
+        - name: info_response_len
+          type: uint8
+          is_a_list: false
+        - name: info_response_string
+          type: string 
+          is_a_list: false
+          string_length_field: info_response_len
+
+  pwm_config:
+    id: 0x03
+
+    request:
+      fields:
+        - name: channel
+          type: uint8
+          is_a_list: false
+        - name: enable
+          type: uint8
+          is_a_list: false
+        - name: frequency
+          type: uint32
+          is_a_list: false
+        - name: duty
+          type: float
+          is_a_list: false
+      
+    response:
+      fields:
+        - name: status
+          type: int8
+          is_a_list: false
+
+  uart_configure:
+    id: 0x04
+
+    request:
+      fields:
+        - name: baud_rate
+          type: uint32
+          is_a_list: false
+
+        - name: parity
+          type: uint8
+          is_a_list: false
+        
+        - name: stop_bits
+          type: uint8
+          is_a_list: false
+
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false
+
+  uart_write:
+    id: 0x05
+
+    request:
+      fields:
+        - name: reset
+          type: uint8
+          is_a_list: false
+
+        - name: start
+          type: uint8
+          is_a_list: false
+
+        - name: length
+          type: uint16
+          is_a_list: false
+
+        - name: payload
+          type: uint8
+          is_a_list: true
+
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false
+
+  uart_read:
+    id: 0x06
+
+    request:
+      fields:
+        - name: reset
+          type: uint8
+          is_a_list: false
+
+        - name: start
+          type: uint8
+          is_a_list: false
+
+        - name: stop
+          type: uint8
+          is_a_list: false
+        
+        - name: blocking_mode
+          type: uint8
+          is_a_list: false
+
+        - name: character_termination_mode
+          type: uint8
+          is_a_list: false
+
+        - name: terminal_byte
+          type: uint8
+          is_a_list: false
+
+        - name: length
+          type: uint32
+          is_a_list: false
+        
+        - name: timeout
+          type: uint32
+          is_a_list: false
+
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false
+        
+        - name: length
+          type: uint32
+          is_a_list: false
+
+  uart_get_from_read_buffer:
+    id: 0x07
+
+    request:
+      fields:
+        - name: start_index
+          type: uint16
+          is_a_list: false
+        
+        - name: length
+          type: uint8
+          is_a_list: false
+
+    response:
+      fields:
+        - name: length
+          type: uint8
+          is_a_list: false
+        
+        - name: received_bytes
+          type: uint8
+          is_a_list: true
+          list_length_field: length
+    
+  uart_put_into_write_buffer:
+    id: 0x08
+    
+    request:
+      fields:
+        - name: reset_buffer
+          type: uint8
+          is_a_list: false
+        
+        - name: start_index
+          type: uint16
+          is_a_list: false
+        
+        - name: length
+          type: uint8
+          is_a_list: false
+        
+        - name: payload
+          type: uint8
+          is_a_list: true
+      
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false
+
+  uart_single_transfer:
+    id: 0x09
+    
+    request:
+      fields:
+        - name: count_limit_mode
+          type: uint8
+          is_a_list: false
+        
+        - name: termination_character_mode
+          type: uint8
+          is_a_list: false
+
+        - name: count_limit
+          type: uint16
+          is_a_list: false
+
+        - name: termination_character
+          type: uint8
+          is_a_list: false
+
+        - name: timeout_us
+          type: uint32
+          is_a_list: false
+      
+    response:
+      fields:
+        - name: length
+          type: uint16
+          is_a_list: false
+
+        - name: status
+          type: uint8
+          is_a_list: false
+
+  uart_consecutive_transfers_configure:
+    id: 0x0A
+
+    request:
+      fields:
+        - name: number_of_transfers
+          type: uint8
+          is_a_list: false
+        
+        - name: character_termination_mode
+          type: uint8
+          is_a_list: false
+        
+        - name: termination_character
+          type: uint8
+          is_a_list: false
+    
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false
+  
+  uart_configure_consecutive_transfer_instance:
+    id: 0x0B
+
+    request:
+      fields:
+        - name: consecutive_transfer_index
+          type: uint8
+          is_a_list: false
+        
+        - name: timeout_us
+          type: uint32
+          is_a_list: false
+        
+        - name: pause_us
+          type: uint32
+          is_a_list: false
+        
+        - name: write_count
+          type: uint16
+          is_a_list: false
+        
+        - name: target_read_count
+          type: uint16
+          is_a_list: false
+    
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false
+    
+  uart_consecutive_transfer_instance_write_bytes:
+    id: 0x0C
+
+    request:
+      fields:
+        - name: transfer_instance
+          type: uint8
+          is_a_list: false
+
+        - name: start_index
+          type: uint8
+          is_a_list: false
+
+        - name: length
+          type: uint8
+          is_a_list: false
+          
+        - name: payload
+          type: uint8
+          is_a_list: true
+      
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false
+    
+  uart_consecutive_transfer_start:
+    id: 0x0D
+
+    request:
+      fields:
+        - name: start
+          type: uint8
+          is_a_list: false
+    
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false
+
+  uart_consecutive_transfer_instance_get_read_count_and_status:
+    id: 0x0E
+
+    request:
+      fields:
+        - name: transfer_instance
+          type: uint8
+          is_a_list: false
+        
+    response:
+      fields:
+        - name: rx_count
+          type: uint16
+          is_a_list: false
+        
+        - name: status
+          type: uint8
+          is_a_list: false
+
+  uart_consecutive_transfer_instance_read_bytes:
+    id: 0x0F
+
+    request:
+      fields:
+        - name: transfer_instance
+          type: uint8
+          is_a_list: false
+
+        - name: start_index
+          type: uint8
+          is_a_list: false
+
+        - name: length
+          type: uint8
+          is_a_list: false
+      
+    response:
+      fields:
+        - name: length
+          type: uint8
+          is_a_list: false
+          
+        - name: payload
+          type: uint8
+          is_a_list: true
+          list_length_field: length
+
+  capture_control:
+    id: 0x10
+
+    request:
+      fields:
+        - name: channel
+          type: uint8
+          is_a_list: false
+
+        - name: start
+          type: uint8
+          is_a_list: false
+        
+        - name: stop
+          type: uint8
+          is_a_list: false
+
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false
+
+  capture_get_data:
+    id: 0x11
+
+    request:
+      fields:
+        - name: channel
+          type: uint8
+          is_a_list: false
+    
+    response:
+      fields:
+        - name: frequency
+          type: uint32
+          is_a_list: false
+        
+        - name: on_time_ns
+          type: uint32
+          is_a_list: false
+
+        - name: off_time_ns
+          type: uint32
+          is_a_list: false
+        
+        - name: period_ns
+          type: uint32
+          is_a_list: false
+        
+        - name: duty
+          type: float
+          is_a_list: false
+
+  hsadc_configure:
+    id: 0x12
+
+    request:
+      fields:
+        - name: sampling_rate
+          type: uint8
+          is_a_list: false
+
+        - name: channels
+          type: uint8
+          is_a_list: false
+    
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false
+    
+  hsadc_control:
+    id: 0x13
+
+    request:
+      fields:
+        - name: start_conversion
+          type: uint8
+          is_a_list: false
+    
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false
+    
+  hsadc_get_samples:
+    id: 0x14
+
+    request:
+      fields:
+        - name: channel
+          type: uint8
+          is_a_list: false
+
+        - name: start_index
+          type: uint16
+          is_a_list: false
+          
+        - name: length
+          type: uint8
+          is_a_list: false
+      
+    response:
+      fields:
+        - name: length
+          type: uint8
+          is_a_list: false
+          
+        - name: samples
+          type: uint16
+          is_a_list: true
+          list_length_field: length

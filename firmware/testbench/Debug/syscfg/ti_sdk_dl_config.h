@@ -234,6 +234,8 @@ delayed. Please refer to the function documentation for more details.
 #define CAPTURE_ECAP0_INT_Handler                                ECAP0_IRQHandler
 #define Systick_INT                                                  SysTick_IRQn
 #define Systick_INT_Handler                                       SysTick_Handler
+#define RS485_UART_INT                                               UC4_INT_IRQn
+#define RS485_UART_INT_Handler                                     UC4_IRQHandler
 #define USER_UART_INT                                                UC2_INT_IRQn
 #define USER_UART_INT_Handler                                      UC2_IRQHandler
 

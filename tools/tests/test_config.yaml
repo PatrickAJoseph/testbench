@@ -1,0 +1,8 @@
+# Serial port settings for the serial port connected to the test bench.
+test_bench_serial_port_name: 'COM24'
+test_bench_serial_port_baud_rate: 115200
+test_bench_serial_port_read_timeout: 600.0
+test_bench_address: 0x10
+
+# Serial port settings for the serial port connected to the UART of the test bench
+user_uart_serial_port_name: 'COM11'

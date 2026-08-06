@@ -99,7 +99,7 @@ void USER_UART_INT_Handler(void)
     DL_UART_clearInterruptStatus(USER_UART_INST, int_status);
 }
 
-static const DL_UART_ClockConfig USER_UART_ClockConfig = {
+static DL_UART_ClockConfig USER_UART_ClockConfig = {
     .clockSel    = DL_UART_CLOCK_BUSCLK,
     .divideRatio = DL_UART_CLOCK_DIVIDE_RATIO_1
 };
@@ -113,17 +113,30 @@ static DL_UART_Config USER_UART_Config = {
     .stopBits    = DL_UART_STOP_BITS_ONE
 };
 
-static void UART_apply_configuration()
+void UART_apply_configuration()
 {
     float div;
     uint32_t ibrd;
     uint32_t fbrd;
+    uint32_t clkdiv;
 
     (void)div;
     (void)ibrd;
     (void)fbrd;
     (void)USER_UART_Config;
     (void)USER_UART_ClockConfig;
+    (void)clkdiv;
+
+    if(user_uart.baudrate < 9600)
+    {
+        clkdiv = 8;
+        USER_UART_ClockConfig.divideRatio = DL_UART_CLOCK_DIVIDE_RATIO_8; 
+    }
+    else
+    {
+        clkdiv = 1;
+        USER_UART_ClockConfig.divideRatio = DL_UART_CLOCK_DIVIDE_RATIO_1; 
+    }
 
     if(user_uart.parity == UART_PARITY_NONE)
     {
@@ -147,22 +160,32 @@ static void UART_apply_configuration()
         USER_UART_Config.stopBits = DL_UART_STOP_BITS_TWO;
     }
 
-    div = (float)(MCLK_FREQ_HZ/2)/(float)( user_uart.baudrate );
-    ibrd = (uint32_t)(div);
-    fbrd = (uint32_t)(64.0f * (div - (float)ibrd) + 0.5f);
-
-    DL_UART_reset(USER_UART_INST);
+    if(user_uart.baudrate < 460800)
+    {
+        div = (float)(MCLK_FREQ_HZ/(2*clkdiv))/(float)( user_uart.baudrate );
+        ibrd = (uint32_t)(div/16);
+        fbrd = (uint32_t)(64.0f * (div - (float)((int)div)) + 0.5f);
+    }
+    else
+    {
+        div = (float)(MCLK_FREQ_HZ/(2*clkdiv))/(float)( user_uart.baudrate );
+        ibrd = (uint32_t)(div/8);
+        fbrd = (uint32_t)(64.0f * (div - (float)((int)div)) + 0.5f);
+    }
 
     DL_UART_setClockConfig(USER_UART_INST, (DL_UART_ClockConfig *) &USER_UART_ClockConfig);
 
     DL_UART_init(USER_UART_INST, (DL_UART_Config *) &USER_UART_Config);
 
-    DL_UART_setOversampling(USER_UART_INST, DL_UART_OVERSAMPLING_RATE_16X);
+    DL_UART_setOversampling(USER_UART_INST, (user_uart.baudrate < 460800 ) ? DL_UART_OVERSAMPLING_RATE_16X : DL_UART_OVERSAMPLING_RATE_8X);
     DL_UART_setBaudRateDivisor(USER_UART_INST, ibrd, fbrd);
 
     /* Configure Interrupts */
-    DL_UART_enableInterrupt(USER_UART_INST, DL_UART_INTERRUPT_RX | DL_UART_INTERRUPT_FRAMING_ERROR |
-            DL_UART_INTERRUPT_OVERRUN_ERROR | DL_UART_INTERRUPT_PARITY_ERROR);
+    DL_UART_enableInterrupt(USER_UART_INST,
+                                 DL_UART_INTERRUPT_FRAMING_ERROR |
+                                 DL_UART_INTERRUPT_OVERRUN_ERROR |
+                                 DL_UART_INTERRUPT_PARITY_ERROR |
+                                 DL_UART_INTERRUPT_RX);
 
     /* Configure FIFOs */
     DL_UART_setRXFIFOThreshold(USER_UART_INST, DL_UART_RX_FIFO_LEVEL_NOT_EMPTY);
@@ -264,7 +287,7 @@ void UART_write()
 
     for( index = 0 ; index < user_uart.write_count ; index++ )
     {
-        DL_UART_transmitData(USER_UART_INST, user_uart.write_buffer[index]);
+        DL_UART_transmitDataBlocking(USER_UART_INST, user_uart.write_buffer[index]);
     }
 }
 
@@ -451,7 +474,7 @@ static void UART_consecutive_transfer_write(uint8_t* data, size_t size)
 
     while(count)
     {
-        DL_UART_transmitData(USER_UART_INST, *ptr);
+        DL_UART_transmitDataBlocking(USER_UART_INST, *ptr);
         ptr++;
         count--;
     }

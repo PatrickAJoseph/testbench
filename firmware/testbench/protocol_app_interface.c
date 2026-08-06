@@ -20,9 +20,9 @@
 #include "pwm.h"
 #include "user_uart.h"
 #include "capture.h"
-//#include "hsadc.h"
+#include "hsadc.h"
 
-static struct protocol_context protocol_context;
+struct protocol_context protocol_context;
 
 void RS485_UART_INT_Handler()
 {
@@ -41,7 +41,7 @@ static void protocol_uart_send(uint8_t* data, size_t length)
 
     while(length)
     {
-        DL_UART_transmitData(RS485_UART_INST, data[index]);
+        DL_UART_transmitDataBlocking(RS485_UART_INST, data[index]);
         index++;
         length--;
     }
@@ -49,7 +49,7 @@ static void protocol_uart_send(uint8_t* data, size_t length)
 
 static void protocol_uart_send_byte(uint8_t byte)
 {
-    DL_UART_transmitData(RS485_UART_INST, byte);
+    DL_UART_transmitDataBlocking(RS485_UART_INST, byte);
 }
 
 static void protocol_uart_init()
@@ -81,7 +81,7 @@ static void ping_device(struct protocol_context* context);
 static void get_device_info(struct protocol_context* context);
 static void pwm_set_config(struct protocol_context* context);
 static void uart_configure(struct protocol_context* context);
-static void uart_write(struct protocol_context* context);
+void uart_write(struct protocol_context* context);
 static void uart_read(struct protocol_context* context);
 static void uart_read_buffer_get(struct protocol_context* context);
 static void uart_put_into_write_buffer(struct protocol_context* context);
@@ -94,9 +94,9 @@ static void uart_consecutive_transfer_instance_get_read_count_and_status(struct 
 static void uart_consecutive_transfer_instance_read_bytes(struct protocol_context* context);
 static void capture_control(struct protocol_context* context);
 static void capture_get_data(struct protocol_context* context);
-//static void hsadc_configure(struct protocol_context* context);
-//static void hsadc_control(struct protocol_context* context);
-//static void hsadc_get_samples(struct protocol_context* context);
+static void hsadc_configure(struct protocol_context* context);
+static void hsadc_control(struct protocol_context* context);
+static void hsadc_get_samples(struct protocol_context* context);
 
 /* Define the command list over here */
 
@@ -119,9 +119,9 @@ static const protocol_app_callback_list_element_t protocol_app_if_callback_list[
  { .command = 0x0F, .callback = uart_consecutive_transfer_instance_read_bytes },
  { .command = 0x10, .callback = capture_control },
  { .command = 0x11, .callback = capture_get_data },
-// { .command = 0x12, .callback = hsadc_configure },
-// { .command = 0x13, .callback = hsadc_control },
-// { .command = 0x14, .callback = hsadc_get_samples },
+{ .command = 0x12, .callback = hsadc_configure },
+{ .command = 0x13, .callback = hsadc_control },
+{ .command = 0x14, .callback = hsadc_get_samples },
  { .command = 0x00, .callback = NULL },
 };
 
@@ -284,7 +284,7 @@ static void uart_configure(struct protocol_context* context)
     context->payload[0] = UART_get_status();
 }
 
-static void uart_write(struct protocol_context* context)
+void uart_write(struct protocol_context* context)
 {
     int number_of_bytes;
     bool reset;
@@ -732,67 +732,64 @@ static void capture_get_data(struct protocol_context* context)
 }
 
 
-// static void hsadc_configure(struct protocol_context* context)
-// {
-//     uint8_t sampling_rate;
-//     uint8_t channels;
-//     uint8_t status;
+static void hsadc_configure(struct protocol_context* context)
+{
+    uint8_t sampling_rate;
+    uint8_t channels;
+    uint8_t status;
 
-//     status = 1;
+    (void)sampling_rate;
+    (void)channels;
+    (void)status;
 
-//     sampling_rate = context->payload[0];
-//     channels = context->payload[1];
+    status = 1;
 
-//     if( HSADC_IS_VALID_CHANNEL_CONFIGURATION(channels) && HSADC_IS_VALID_SAMPLING_RATE(sampling_rate) )
-//     {
-//         HSADC_set_channel_configuration(channels);
-//         HSADC_set_sampling_rate(sampling_rate);
-//         status = 0;
-//     }
+    sampling_rate = context->payload[0];
+    channels = context->payload[1];
 
-//     protocol_set_response_payload_length(context, 1);
+    HSADC_set_sampling_rate(sampling_rate);
 
-//     context->payload[0] = status;
-// }
+    protocol_set_response_payload_length(context, 1);
+
+    context->payload[0] = 0;
+}
 
 
-// static void hsadc_control(struct protocol_context* context)
-// {
-//     uint8_t start_conversion;
+static void hsadc_control(struct protocol_context* context)
+{
+    uint8_t start_conversion;
 
-//     start_conversion = context->payload[0];
+    start_conversion = context->payload[0];
 
-//     if(start_conversion)
-//     {
-//         HSADC_start_conversion();
+    if(start_conversion)
+    {
+        HSADC_acquire();
+    }
 
-//         while(!HSADC_is_sampling_done());
-//     }
+    protocol_set_response_payload_length(context, 1);
 
-//     protocol_set_response_payload_length(context, 1);
+    context->payload[0] = 0;
+}
 
-//     context->payload[0] = 0;
-// }
+static void hsadc_get_samples(struct protocol_context* context)
+{
+    uint8_t channel;
+    uint16_t start_index;
+    uint16_t length;
+    uint16_t index;
+    uint16_t current_sample;
 
-// static void hsadc_get_samples(struct protocol_context* context)
-// {
-//     uint8_t channel;
-//     uint16_t start_index;
-//     uint16_t length;
-//     uint16_t index;
-//     uint16_t current_sample;
+    channel = context->payload[0];
+    PROTOCOL_READ_UINT16( context, &start_index, 1 );
+    length = (uint16_t)context->payload[3];
 
-//     channel = context->payload[0];
-//     PROTOCOL_READ_UINT16( context, &start_index, 1 );
-//     length = (uint16_t)context->payload[3];
+    protocol_set_response_payload_length(context, (1 + (length*2)));
 
-//     protocol_set_response_payload_length(context, (1 + (length*2)));
+    PROTOCOL_WRITE_UINT8( context, length, 0 );
 
-//     PROTOCOL_WRITE_UINT8( context, length, 0 );
-
-//     for( index = 0 ; index < length; index++ )
-//     {
-//         current_sample = HSADC_get_sample(channel, start_index + index);
-//         PROTOCOL_WRITE_UINT16( context, current_sample, (2*index + 1) );
-//     }
-// }
+    for( index = 0 ; index < length; index++ )
+    {
+        current_sample = HSADC_get_sample(channel, start_index + index);
+        PROTOCOL_WRITE_UINT16( context, current_sample, (2*index + 1) );
+    }
+}

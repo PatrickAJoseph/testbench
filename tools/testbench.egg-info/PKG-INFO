@@ -1,0 +1,5 @@
+Metadata-Version: 2.4
+Name: testbench
+Version: 0.1.0
+Summary: Embedded protocol test bench
+Requires-Python: >=3.10
