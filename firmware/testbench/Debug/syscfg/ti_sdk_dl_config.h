@@ -80,6 +80,13 @@ delayed. Please refer to the function documentation for more details.
 
 
 
+/* Port definition for Pin Group TEST_GROUP */
+#define TEST_GROUP_PORT                                                  (GPIO0)
+#define TEST_GROUP_PORT_BASE                                        (GPIO0_BASE)
+
+/* Defines for TEST_PIN_0: GPIO0.30 with pinCMx PA30 on package pin 36 */
+#define TEST_GROUP_TEST_PIN_0_PIN                              (DL_GPIO_PIN(30))
+#define TEST_GROUP_TEST_PIN_0_IOMUX                           (IOMUX_PINCM_PA30)
 /* Port definition for Pin Group CAPTURE_DIN_GPIO_GROUP */
 #define CAPTURE_DIN_GPIO_GROUP_PORT                                      (GPIO0)
 #define CAPTURE_DIN_GPIO_GROUP_PORT_BASE                            (GPIO0_BASE)
@@ -100,6 +107,16 @@ delayed. Please refer to the function documentation for more details.
 /* Defines for SPI_CS_IOEXP: GPIO1.11 with pinCMx PB11 on package pin 53 */
 #define SPI_GPIO_GROUP_SPI_CS_IOEXP_PIN                        (DL_GPIO_PIN(11))
 #define SPI_GPIO_GROUP_SPI_CS_IOEXP_IOMUX                     (IOMUX_PINCM_PB11)
+/* Port definition for Pin Group IOEXP_GROUP */
+#define IOEXP_GROUP_PORT                                                 (GPIO0)
+#define IOEXP_GROUP_PORT_BASE                                       (GPIO0_BASE)
+
+/* Defines for IOEXP_OUTPUT_LOAD: GPIO0.26 with pinCMx PA26 on package pin 30 */
+#define IOEXP_GROUP_IOEXP_OUTPUT_LOAD_PIN                      (DL_GPIO_PIN(26))
+#define IOEXP_GROUP_IOEXP_OUTPUT_LOAD_IOMUX                   (IOMUX_PINCM_PA26)
+/* Defines for IOEXP_INPUT_LOAD: GPIO0.9 with pinCMx PA9 on package pin 43 */
+#define IOEXP_GROUP_IOEXP_INPUT_LOAD_PIN                        (DL_GPIO_PIN(9))
+#define IOEXP_GROUP_IOEXP_INPUT_LOAD_IOMUX                     (IOMUX_PINCM_PA9)
 
 
 /* Defines for CAPTURE_INPUTXBAR1 */
@@ -113,6 +130,12 @@ delayed. Please refer to the function documentation for more details.
 #define HSADC_DMA_CHANNEL_ID                    0
 #define HSADC_DMA_CHANNEL_INTERRUPT_MASK        DL_DMA_FULL_TRANSFER_COMPLETE_INTERRUPT_MASK(0)
 #define HSADC_DMA_CHANNEL_EARLY_INTERRUPT_MASK  DL_DMA_HALF_TRANSFER_COMPLETE_INTERRUPT_MASK(0)
+
+
+/* Defines for USER_TIMER */
+#define USER_TIMER_INST                                                 (TIMG12)
+#define USER_TIMER_INST_LOAD_VALUE                                       (9999U)
+
 
 
 #define HSADC_INST                                                           ADC0
@@ -219,16 +242,16 @@ delayed. Please refer to the function documentation for more details.
 #define RS485_UART_IBRD_100_MHZ_115200_BAUD                                 (54)
 #define RS485_UART_FBRD_100_MHZ_115200_BAUD                                 (16)
 /* Defines for USER_UART */
-#define USER_UART_INST                                              UC2_INST_PTR
+#define USER_UART_INST                                              UC0_INST_PTR
 #define USER_UART_INST_FREQUENCY                                       100000000
 #define GPIO_USER_UART_RX_PORT                                             GPIO0
 #define GPIO_USER_UART_TX_PORT                                             GPIO0
-#define GPIO_USER_UART_RX_PIN                                     DL_GPIO_PIN_23
-#define GPIO_USER_UART_TX_PIN                                     DL_GPIO_PIN_22
-#define GPIO_USER_UART_IOMUX_RX                               (IOMUX_PINCM_PA23)
-#define GPIO_USER_UART_IOMUX_TX                               (IOMUX_PINCM_PA22)
-#define GPIO_USER_UART_IOMUX_RX_FUNC                       IOMUX_PA23_UC2_RX_SCL
-#define GPIO_USER_UART_IOMUX_TX_FUNC                       IOMUX_PA22_UC2_TX_SDA
+#define GPIO_USER_UART_RX_PIN                                     DL_GPIO_PIN_27
+#define GPIO_USER_UART_TX_PIN                                     DL_GPIO_PIN_21
+#define GPIO_USER_UART_IOMUX_RX                               (IOMUX_PINCM_PA27)
+#define GPIO_USER_UART_IOMUX_TX                               (IOMUX_PINCM_PA21)
+#define GPIO_USER_UART_IOMUX_RX_FUNC                  IOMUX_PA27_UC0_RX_SCL_SCLK
+#define GPIO_USER_UART_IOMUX_TX_FUNC                  IOMUX_PA21_UC0_TX_SDA_PICO
 #define USER_UART_BAUD_RATE                                             (115200)
 #define USER_UART_IBRD_100_MHZ_115200_BAUD                                  (54)
 #define USER_UART_FBRD_100_MHZ_115200_BAUD                                  (16)
@@ -250,6 +273,77 @@ delayed. Please refer to the function documentation for more details.
 #define GPIO_SPI_COMMON_SCLK_PIN                                 DL_GPIO_PIN_18
 #define GPIO_SPI_COMMON_IOMUX_SCLK                           (IOMUX_PINCM_PB18)
 #define GPIO_SPI_COMMON_IOMUX_SCLK_FUNC              IOMUX_PB18_UC3_RX_SCL_SCLK
+/* Defines for IOEXP_SPI */
+#define IOEXP_SPI_INST                                             UC1_INST_PTR
+#define GPIO_IOEXP_SPI_PICO_PORT                                          GPIO0
+#define GPIO_IOEXP_SPI_PICO_PIN                                  DL_GPIO_PIN_10
+#define GPIO_IOEXP_SPI_IOMUX_PICO                            (IOMUX_PINCM_PA10)
+#define GPIO_IOEXP_SPI_IOMUX_PICO_FUNC               IOMUX_PA10_UC1_TX_SDA_PICO
+#define GPIO_IOEXP_SPI_POCI_PORT                                          GPIO0
+#define GPIO_IOEXP_SPI_POCI_PIN                                  DL_GPIO_PIN_28
+#define GPIO_IOEXP_SPI_IOMUX_POCI                            (IOMUX_PINCM_PA28)
+#define GPIO_IOEXP_SPI_IOMUX_POCI_FUNC                  IOMUX_PA28_UC1_RTS_POCI
+/* GPIO configuration for IOEXP_SPI */
+#define GPIO_IOEXP_SPI_SCLK_PORT                                          GPIO0
+#define GPIO_IOEXP_SPI_SCLK_PIN                                   DL_GPIO_PIN_3
+#define GPIO_IOEXP_SPI_IOMUX_SCLK                             (IOMUX_PINCM_PA3)
+#define GPIO_IOEXP_SPI_IOMUX_SCLK_FUNC                IOMUX_PA3_UC1_RX_SCL_SCLK
+
+
+
+/* Defines for USER_I2C */
+#define USER_I2C_INST                                               UC5_INST_PTR
+#define USER_I2C_BUS_SPEED_HZ                                             100000
+#define GPIO_USER_I2C_SDA_PORT                                             GPIO0
+#define GPIO_USER_I2C_SDA_PIN                                     DL_GPIO_PIN_22
+#define GPIO_USER_I2C_IOMUX_SDA                               (IOMUX_PINCM_PA22)
+#define GPIO_USER_I2C_IOMUX_SDA_FUNC                       IOMUX_PA22_UC5_TX_SDA
+#define GPIO_USER_I2C_SCL_PORT                                             GPIO0
+#define GPIO_USER_I2C_SCL_PIN                                     DL_GPIO_PIN_23
+#define GPIO_USER_I2C_IOMUX_SCL                               (IOMUX_PINCM_PA23)
+#define GPIO_USER_I2C_IOMUX_SCL_FUNC                       IOMUX_PA23_UC5_RX_SCL
+
+/* Defines for ADS1115_I2C */
+#define ADS1115_I2C_INST                                            UC2_INST_PTR
+#define ADS1115_I2C_BUS_SPEED_HZ                                          100000
+#define GPIO_ADS1115_I2C_SDA_PORT                                          GPIO1
+#define GPIO_ADS1115_I2C_SDA_PIN                                   DL_GPIO_PIN_7
+#define GPIO_ADS1115_I2C_IOMUX_SDA                             (IOMUX_PINCM_PB7)
+#define GPIO_ADS1115_I2C_IOMUX_SDA_FUNC                     IOMUX_PB7_UC2_TX_SDA
+#define GPIO_ADS1115_I2C_SCL_PORT                                          GPIO1
+#define GPIO_ADS1115_I2C_SCL_PIN                                   DL_GPIO_PIN_6
+#define GPIO_ADS1115_I2C_IOMUX_SCL                             (IOMUX_PINCM_PB6)
+#define GPIO_ADS1115_I2C_IOMUX_SCL_FUNC                     IOMUX_PB6_UC2_RX_SCL
+
+
+/* Defines for USER_CAN */
+#define USER_CAN_INST                                                      MCAN0
+#define GPIO_USER_CAN_CAN_TX_PORT                                          GPIO0
+#define GPIO_USER_CAN_CAN_TX_PIN                                  DL_GPIO_PIN_12
+#define GPIO_USER_CAN_IOMUX_CAN_TX                            (IOMUX_PINCM_PA12)
+#define GPIO_USER_CAN_IOMUX_CAN_TX_FUNC                      IOMUX_PA12_MCAN0_TX
+#define GPIO_USER_CAN_CAN_RX_PORT                                          GPIO0
+#define GPIO_USER_CAN_CAN_RX_PIN                                  DL_GPIO_PIN_11
+#define GPIO_USER_CAN_IOMUX_CAN_RX                            (IOMUX_PINCM_PA11)
+#define GPIO_USER_CAN_IOMUX_CAN_RX_FUNC                      IOMUX_PA11_MCAN0_RX
+
+
+/* Defines for USER_CAN MCAN RAM configuration */
+#define USER_CAN_INST_MCAN_STD_ID_FILT_START_ADDR     (0)
+#define USER_CAN_INST_MCAN_STD_ID_FILTER_NUM          (1)
+#define USER_CAN_INST_MCAN_EXT_ID_FILT_START_ADDR     (48)
+#define USER_CAN_INST_MCAN_EXT_ID_FILTER_NUM          (1)
+#define USER_CAN_INST_MCAN_TX_BUFF_START_ADDR         (148)
+#define USER_CAN_INST_MCAN_TX_BUFF_SIZE               (2)
+#define USER_CAN_INST_MCAN_FIFO_1_START_ADDR          (192)
+#define USER_CAN_INST_MCAN_FIFO_1_NUM                 (2)
+#define USER_CAN_INST_MCAN_TX_EVENT_START_ADDR        (164)
+#define USER_CAN_INST_MCAN_TX_EVENT_SIZE              (2)
+#define USER_CAN_INST_MCAN_EXT_ID_AND_MASK            (0x1FFFFFFFU)
+#define USER_CAN_INST_MCAN_RX_BUFF_START_ADDR         (208)
+#define USER_CAN_INST_MCAN_FIFO_0_START_ADDR          (172)
+#define USER_CAN_INST_MCAN_FIFO_0_NUM                 (3)
+
 
 
 
@@ -261,10 +355,12 @@ delayed. Please refer to the function documentation for more details.
 #define CAPTURE_ECAP0_INT_Handler                                ECAP0_IRQHandler
 #define Systick_INT                                                  SysTick_IRQn
 #define Systick_INT_Handler                                       SysTick_Handler
+#define USER_TIMER_INT                                          TIMG12_0_INT_IRQn
+#define USER_TIMER_INT_Handler                                TIMG12_0_IRQHandler
 #define RS485_UART_INT                                               UC4_INT_IRQn
 #define RS485_UART_INT_Handler                                     UC4_IRQHandler
-#define USER_UART_INT                                                UC2_INT_IRQn
-#define USER_UART_INT_Handler                                      UC2_IRQHandler
+#define USER_UART_INT                                                UC0_INT_IRQn
+#define USER_UART_INT_Handler                                      UC0_IRQHandler
 
 
 void SYSCFG_DL_SYSCTL_CLK_init(void);
@@ -272,6 +368,7 @@ void SYSCFG_DL_SYSCTL_init(void);
 
 void SYSCFG_DL_INPUTXBAR_init(void);
 void SYSCFG_DL_DMA0_init(void);
+void SYSCFG_DL_USER_TIMER_init(void);
 void SYSCFG_DL_HSADC_init(void);
 void SYSCFG_DL_CAPTURE_ECAP0_init(void);
 void SYSCFG_DL_CAPTURE_ECAP1_init(void);
@@ -283,6 +380,10 @@ void SYSCFG_DL_HSADC_TRIGGER_PWM_init(void);
 void SYSCFG_DL_RS485_UART_init(void);
 void SYSCFG_DL_USER_UART_init(void);
 void SYSCFG_DL_SPI_COMMON_init(void);
+void SYSCFG_DL_IOEXP_SPI_init(void);
+void SYSCFG_DL_USER_I2C_init(void);
+void SYSCFG_DL_ADS1115_I2C_init(void);
+void SYSCFG_DL_USER_CAN_init(void);
 void SYSCFG_DL_SYSTICK_init(void);
 void SYSCFG_DL_INTERRUPT_init(void);
 

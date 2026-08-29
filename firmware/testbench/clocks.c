@@ -10,7 +10,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define CLOCKS_SYSTICK_MAX_VALUE        (CLOCKS_SYSTEM_FREQUENCY / 10)
+#define CLOCKS_SYSTICK_MAX_VALUE        (16777216U)
 
 volatile clock_t Clocks_systick_isr_count = 0;
 
@@ -24,7 +24,8 @@ void Clocks_init()
 
 }
 
-int64_t Clocks_get_tick_count(void)
+/*
+clock_t Clocks_get_tick_count(void)
 {
     clock_t ticks;
     uint32_t systick_count;
@@ -36,6 +37,26 @@ int64_t Clocks_get_tick_count(void)
     ticks += ((clock_t)CLOCKS_SYSTICK_MAX_VALUE - (clock_t)systick_count);
 
     return ticks;
+}
+*/
+
+clock_t Clocks_get_tick_count(void)
+{
+    uint32_t isr_count_1;
+    uint32_t isr_count_2;
+    uint32_t systick_count;
+
+    do
+    {
+        isr_count_1 = Clocks_systick_isr_count;
+        systick_count = DL_SYSTICK_getValue();
+        isr_count_2 = Clocks_systick_isr_count;
+    }
+    while (isr_count_1 != isr_count_2);
+
+    return
+        (isr_count_1 * CLOCKS_SYSTICK_MAX_VALUE) +
+        (CLOCKS_SYSTICK_MAX_VALUE - systick_count);
 }
 
 clock_t Clocks_get_time_us(void)
@@ -80,12 +101,12 @@ void Clocks_wait_us_precise(clock_t us)
 
     ticks = (uint32_t)((CLOCKS_SYSTEM_FREQUENCY / 1000000U) * us);
 
-    start = DL_SYSTICK_getValue();
+    start = (1U << 24) - DL_SYSTICK_getValue() + (Clocks_systick_isr_count * (1U << 24));
 
     do
     {
-        now = DL_SYSTICK_getValue();
+        now = (1U << 24) - DL_SYSTICK_getValue() + (Clocks_systick_isr_count * (1U << 24));
 
-        elapsed = (start - now) & ((1U << 24) - 1);
+        elapsed = (now - start);
     } while(elapsed < ticks);
 }

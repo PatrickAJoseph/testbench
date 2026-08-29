@@ -27,6 +27,7 @@ digraph {
             ADC0_DMAINT1
             ECAP0_INT [label="ECAP0_INT\n(CEVT3)"]
             ECAP1_INT [label="ECAP1_INT\n(CEVT3)"]
+            TIMG12_0_INT
 
         node [shape=rectangle style=filled fillcolor="#A0A0FF"];
             ADC0_SOC0
@@ -58,6 +59,9 @@ digraph {
             PWM1_DB_1A
             PWM1_AQ_1A [label="PWM1_AQ_1A\n(Zero:HIGH\nCountUpCmpA:LOW)"]
             PWM1_SOCA [label="PWM1_SOCA\n(TBCTR=ZERO)"]
+            TIMG12_0_CTR [label="TIMG12_0_CTR\n(PERIODIC,
+Period = 100.00 μs)"]
+            TIMG12_0_INT
 
         PA16 -> ADC0_SOC0
         PA17 -> ADC0_SOC1
@@ -84,6 +88,7 @@ digraph {
         PWM1_DB_1A -> PWM1_1A
         PWM1_1A -> PA15
         PWM1_AQ_1A -> PWM1_DB_1A
+        TIMG12_0_CTR -> TIMG12_0_INT [label="ZERO"]
 
         subgraph cluster_ADC0_ {
             margin=10 style=invis
@@ -155,6 +160,15 @@ digraph {
                 style=filled
                 
                 PWM2_2A PWM2_DB_2A PWM2_AQ_2A
+            }
+        }
+        subgraph cluster_TIMG12_0_ {
+            margin=10 style=invis
+            subgraph cluster_TIMG12_0 {
+                label = "TIMG12_0\n(USER_TIMER)"
+                style=filled
+                
+                TIMG12_0_CTR TIMG12_0_INT
             }
         }
 }

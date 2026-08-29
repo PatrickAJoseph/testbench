@@ -1,6 +1,6 @@
 # FIXED
 
-main.o: ../main.c \
+.o: ../main.c \
  C:/ti/am13e230x_sdk_26_01_00_03/ti_sdk_config/am13e230x/default/device_support/include/device.h \
  syscfg/ti_sdk_dl_config.h \
  C:/ti/am13e230x_sdk_26_01_00_03/source/driverlib/am13e230x/driverlib.h \
@@ -74,8 +74,9 @@ main.o: ../main.c \
  C:/ti/am13e230x_sdk_26_01_00_03/source/driverlib/am13e230x/dl_wwdt.h \
  C:/ti/am13e230x_sdk_26_01_00_03/source/driverlib/am13e230x/dl_xbar.h \
  C:/ti/am13e230x_sdk_26_01_00_03/source/cmsis/Core/Include/cmsis_compiler.h \
- ../clocks.h ../user_uart.h ../capture.h ../pwm.h ../hsadc.h \
- ../user_spi.h ../protocol_app_interface.h
+ ../clocks.h ../user_uart.h ../user_i2c.h ../capture.h ../pwm.h \
+ ../hsadc.h ../user_spi.h ../user_gpio.h ../user_timer.h \
+ ../configurations.h ../protocol_app_interface.h ../ads1115.h
 C:/ti/am13e230x_sdk_26_01_00_03/ti_sdk_config/am13e230x/default/device_support/include/device.h:
 syscfg/ti_sdk_dl_config.h:
 C:/ti/am13e230x_sdk_26_01_00_03/source/driverlib/am13e230x/driverlib.h:
@@ -151,8 +152,13 @@ C:/ti/am13e230x_sdk_26_01_00_03/source/driverlib/am13e230x/dl_xbar.h:
 C:/ti/am13e230x_sdk_26_01_00_03/source/cmsis/Core/Include/cmsis_compiler.h:
 ../clocks.h:
 ../user_uart.h:
+../user_i2c.h:
 ../capture.h:
 ../pwm.h:
 ../hsadc.h:
 ../user_spi.h:
+../user_gpio.h:
+../user_timer.h:
+../configurations.h:
 ../protocol_app_interface.h:
+../ads1115.h:

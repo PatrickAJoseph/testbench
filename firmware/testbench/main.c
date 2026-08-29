@@ -1,21 +1,26 @@
-
 #include "device.h"
+
 #include "ti_sdk_dl_config.h"
 
 #include "clocks.h"
 #include "user_uart.h"
+#include "user_i2c.h"
 #include "capture.h"
 #include "pwm.h"
 #include "hsadc.h"
 #include "user_spi.h"
-
+#include "user_gpio.h"
+#include "user_timer.h"
+#include "configurations.h"
 #include "protocol_app_interface.h"
+#include "ads1115.h"
+
+uint8_t ads1115_regs[4];
 
 int main()
 {
-    int index;
-
     Device_Init();
+
     SYSCFG_DL_init();
 
     Clocks_init();
@@ -24,20 +29,22 @@ int main()
     PWM_init();
     HSADC_init();
     SPI_init();
-    SPI_set_bitrate(2500000);
+    I2C_init();
+    GPIO_init();
+    Timer_init();
+    ADS1115_init();
 
-    SPI_set_transfer_count(64);
-
-    for( index = 0 ; index < 64 ; index++ )
-    {
-        SPI_write_buffer_put(index, index);
-    }
+    configuration_init();
 
     protocol_app_interface_init();
 
     while(1)
     {
-        SPI_start_transfer();
+        ads1115_regs[0] = 0x0A;
+        ADS1115_write_registers(2, ads1115_regs, 1);
+        DL_Common_delayCycles(900000);
+        ADS1115_read_registers(2, ads1115_regs, 1);
+        DL_Common_delayCycles(900000);
     }
 
     return 0;

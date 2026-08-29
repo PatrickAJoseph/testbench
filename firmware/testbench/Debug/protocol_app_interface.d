@@ -75,7 +75,8 @@ protocol_app_interface.o: ../protocol_app_interface.c \
  C:/ti/am13e230x_sdk_26_01_00_03/source/driverlib/am13e230x/dl_wwdt.h \
  C:/ti/am13e230x_sdk_26_01_00_03/source/driverlib/am13e230x/dl_xbar.h \
  C:/ti/am13e230x_sdk_26_01_00_03/source/cmsis/Core/Include/cmsis_compiler.h \
- ../pwm.h ../user_uart.h ../clocks.h ../capture.h ../hsadc.h
+ ../pwm.h ../user_uart.h ../clocks.h ../user_i2c.h ../user_spi.h \
+ ../user_gpio.h ../capture.h ../hsadc.h
 ../protocol_app_interface.h:
 ../protocol.h:
 C:/ti/am13e230x_sdk_26_01_00_03/ti_sdk_config/am13e230x/default/device_support/include/device.h:
@@ -154,5 +155,8 @@ C:/ti/am13e230x_sdk_26_01_00_03/source/cmsis/Core/Include/cmsis_compiler.h:
 ../pwm.h:
 ../user_uart.h:
 ../clocks.h:
+../user_i2c.h:
+../user_spi.h:
+../user_gpio.h:
 ../capture.h:
 ../hsadc.h:

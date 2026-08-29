@@ -50,6 +50,7 @@ SYSCONFIG_WEAK void SYSCFG_DL_init(void)
     SYSCFG_DL_SYSCTL_init();
 	SYSCFG_DL_INPUTXBAR_init();
     SYSCFG_DL_DMA0_init();
+    SYSCFG_DL_USER_TIMER_init();
     SYSCFG_DL_HSADC_init();
     SYSCFG_DL_CAPTURE_ECAP0_init();
     SYSCFG_DL_CAPTURE_ECAP1_init();
@@ -61,6 +62,10 @@ SYSCONFIG_WEAK void SYSCFG_DL_init(void)
     SYSCFG_DL_RS485_UART_init();
     SYSCFG_DL_USER_UART_init();
     SYSCFG_DL_SPI_COMMON_init();
+    SYSCFG_DL_IOEXP_SPI_init();
+    SYSCFG_DL_USER_I2C_init();
+    SYSCFG_DL_ADS1115_I2C_init();
+    SYSCFG_DL_USER_CAN_init();
     SYSCFG_DL_SYSTICK_init();
     SYSCFG_DL_INTERRUPT_init();
 }
@@ -74,6 +79,7 @@ SYSCONFIG_WEAK void SYSCFG_DL_initPower(void)
 
 	DL_SYSCTL_resetPeripheral(DL_SYSCTL_RESET_XBAR);
 
+    DL_TimerG_reset(USER_TIMER_INST);
     DL_ADC_reset(HSADC_INST);
     DL_SYSCTL_resetPeripheral(DL_SYSCTL_RESET_ECAP0);
     DL_SYSCTL_resetPeripheral(DL_SYSCTL_RESET_ECAP1);
@@ -86,6 +92,10 @@ SYSCONFIG_WEAK void SYSCFG_DL_initPower(void)
     DL_UART_reset(RS485_UART_INST);
     DL_UART_reset(USER_UART_INST);
     DL_SPI_reset(SPI_COMMON_INST);
+    DL_SPI_reset(IOEXP_SPI_INST);
+    DL_I2CC_reset(USER_I2C_INST);
+    DL_I2CC_reset(ADS1115_I2C_INST);
+    DL_MCAN_reset(USER_CAN_INST);
 
 
     DL_GPIO_enablePower(GPIO0);
@@ -95,6 +105,7 @@ SYSCONFIG_WEAK void SYSCFG_DL_initPower(void)
 
 	DL_SYSCTL_enablePower(DL_SYSCTL_PWREN_XBAR);
 
+    DL_TimerG_enablePower(USER_TIMER_INST);
     DL_ADC_enablePower(HSADC_INST);
     DL_SYSCTL_enablePower(DL_SYSCTL_PWREN_ECAP0);
     DL_SYSCTL_enablePower(DL_SYSCTL_PWREN_ECAP1);
@@ -106,6 +117,10 @@ SYSCONFIG_WEAK void SYSCFG_DL_initPower(void)
     DL_UART_enablePower(RS485_UART_INST);
     DL_UART_enablePower(USER_UART_INST);
     DL_SPI_enablePower(SPI_COMMON_INST);
+    DL_SPI_enablePower(IOEXP_SPI_INST);
+    DL_I2CC_enablePower(USER_I2C_INST);
+    DL_I2CC_enablePower(ADS1115_I2C_INST);
+    DL_MCAN_enablePower(USER_CAN_INST);
 
 }
 
@@ -113,6 +128,8 @@ SYSCONFIG_WEAK void SYSCFG_DL_Pinmux_init(void)
 {
     DL_GPIO_initPeripheralAnalogFunction(IOMUX_PINCM_PC16_X1);
     DL_GPIO_initPeripheralAnalogFunction(IOMUX_PINCM_PC17_X2);
+
+    DL_GPIO_initDigitalOutput(TEST_GROUP_TEST_PIN_0_IOMUX);
 
     DL_GPIO_initDigitalInput(CAPTURE_DIN_GPIO_GROUP_CAPTURE_CH0_DIN_IOMUX);
 
@@ -122,6 +139,16 @@ SYSCONFIG_WEAK void SYSCFG_DL_Pinmux_init(void)
 
     DL_GPIO_initDigitalOutput(SPI_GPIO_GROUP_SPI_CS_IOEXP_IOMUX);
 
+    DL_GPIO_initDigitalOutput(IOEXP_GROUP_IOEXP_OUTPUT_LOAD_IOMUX);
+
+    DL_GPIO_initDigitalOutput(IOEXP_GROUP_IOEXP_INPUT_LOAD_IOMUX);
+
+    DL_GPIO_clearPins(GPIO0, TEST_GROUP_TEST_PIN_0_PIN |
+		IOEXP_GROUP_IOEXP_OUTPUT_LOAD_PIN |
+		IOEXP_GROUP_IOEXP_INPUT_LOAD_PIN);
+    DL_GPIO_enableOutput(GPIO0, TEST_GROUP_TEST_PIN_0_PIN |
+		IOEXP_GROUP_IOEXP_OUTPUT_LOAD_PIN |
+		IOEXP_GROUP_IOEXP_INPUT_LOAD_PIN);
     DL_GPIO_clearPins(SPI_GPIO_GROUP_PORT, SPI_GPIO_GROUP_SPI_CS_USER_0_PIN |
 		SPI_GPIO_GROUP_SPI_CS_IOEXP_PIN);
     DL_GPIO_enableOutput(SPI_GPIO_GROUP_PORT, SPI_GPIO_GROUP_SPI_CS_USER_0_PIN |
@@ -146,6 +173,36 @@ SYSCONFIG_WEAK void SYSCFG_DL_Pinmux_init(void)
         GPIO_SPI_COMMON_IOMUX_PICO, GPIO_SPI_COMMON_IOMUX_PICO_FUNC);
     DL_GPIO_initPeripheralInputFunction(
         GPIO_SPI_COMMON_IOMUX_POCI, GPIO_SPI_COMMON_IOMUX_POCI_FUNC);
+    DL_GPIO_initPeripheralOutputFunction(
+        GPIO_IOEXP_SPI_IOMUX_SCLK, GPIO_IOEXP_SPI_IOMUX_SCLK_FUNC);
+    DL_GPIO_initPeripheralOutputFunction(
+        GPIO_IOEXP_SPI_IOMUX_PICO, GPIO_IOEXP_SPI_IOMUX_PICO_FUNC);
+    DL_GPIO_initPeripheralInputFunction(
+        GPIO_IOEXP_SPI_IOMUX_POCI, GPIO_IOEXP_SPI_IOMUX_POCI_FUNC);
+
+    
+	DL_GPIO_initPeripheralInputFunctionFeatures(
+		 GPIO_USER_I2C_IOMUX_SDA, GPIO_USER_I2C_IOMUX_SDA_FUNC,
+		 DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_PULL_UP, DL_GPIO_WAKEUP_DISABLE);
+	DL_GPIO_initPeripheralInputFunctionFeatures(
+		 GPIO_USER_I2C_IOMUX_SCL, GPIO_USER_I2C_IOMUX_SCL_FUNC,
+		 DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_PULL_UP, DL_GPIO_WAKEUP_DISABLE);
+    DL_GPIO_enableHiZ(GPIO_USER_I2C_IOMUX_SDA);
+    DL_GPIO_enableHiZ(GPIO_USER_I2C_IOMUX_SCL);
+    
+	DL_GPIO_initPeripheralInputFunctionFeatures(
+		 GPIO_ADS1115_I2C_IOMUX_SDA, GPIO_ADS1115_I2C_IOMUX_SDA_FUNC,
+		 DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_PULL_UP, DL_GPIO_WAKEUP_DISABLE);
+	DL_GPIO_initPeripheralInputFunctionFeatures(
+		 GPIO_ADS1115_I2C_IOMUX_SCL, GPIO_ADS1115_I2C_IOMUX_SCL_FUNC,
+		 DL_GPIO_INVERSION_DISABLE, DL_GPIO_RESISTOR_PULL_UP, DL_GPIO_WAKEUP_DISABLE);
+    DL_GPIO_enableHiZ(GPIO_ADS1115_I2C_IOMUX_SDA);
+    DL_GPIO_enableHiZ(GPIO_ADS1115_I2C_IOMUX_SCL);
+
+    DL_GPIO_initPeripheralOutputFunction(
+        GPIO_USER_CAN_IOMUX_CAN_TX, GPIO_USER_CAN_IOMUX_CAN_TX_FUNC);
+    DL_GPIO_initPeripheralInputFunction(
+        GPIO_USER_CAN_IOMUX_CAN_RX, GPIO_USER_CAN_IOMUX_CAN_RX_FUNC);
 
     DL_GPIO_initPeripheralAnalogFunction(IOMUX_PINCM_PA16);
     DL_GPIO_initPeripheralAnalogFunction(IOMUX_PINCM_PA17);
@@ -217,6 +274,44 @@ SYSCONFIG_WEAK void SYSCFG_DL_DMA0_init(void){
     DL_DMA_setBurstSize(DMA0, DL_DMA_BURST_SIZE_8);
     DL_DMA_enableRoundRobinPriority(DMA0);
     SYSCFG_DL_HSADC_DMA_init();
+}
+
+
+
+/*
+ * Timer clock configuration to be sourced by BUSCLK /  (100000000 Hz)
+ * timerClkFreq = (timerClkSrc / (timerClkDivRatio * (timerClkPrescale + 1)))
+ *   100000000 Hz = 100000000 Hz / (DL_TIMER_CLOCK_DIVIDE_1 * (0 + 1))
+ */
+static const DL_TimerG_ClockConfig gUSER_TIMERClockConfig = {
+    .clockSel    = DL_TIMER_CLOCK_BUSCLK,
+    .divideRatio = DL_TIMER_CLOCK_DIVIDE_1,
+    .prescale    = 0U,
+};
+
+/*
+ * Timer load value (where the counter starts from) is calculated as (timerPeriod * timerClockFreq) - 1
+ * USER_TIMER_INST_LOAD_VALUE = (100000ns * 100000000 Hz) - 1
+ */
+static const DL_TimerG_TimerConfig gUSER_TIMERTimerConfig = {
+    .period     = USER_TIMER_INST_LOAD_VALUE,
+    .timerMode  = DL_TIMER_TIMER_MODE_PERIODIC,
+    .startTimer = DL_TIMER_START,
+};
+
+SYSCONFIG_WEAK void SYSCFG_DL_USER_TIMER_init(void) {
+
+    DL_TimerG_setClockConfig(USER_TIMER_INST,
+        (DL_TimerG_ClockConfig *) &gUSER_TIMERClockConfig);
+
+    DL_TimerG_initTimerMode(USER_TIMER_INST,
+        (DL_TimerG_TimerConfig *) &gUSER_TIMERTimerConfig);
+
+     DL_TimerG_enableInterrupt(USER_TIMER_INST, (DL_TIMER_INTERRUPT_ZERO_EVENT));
+
+    DL_TimerG_enableClock(USER_TIMER_INST);
+
+
 }
 
 
@@ -868,12 +963,229 @@ SYSCONFIG_WEAK void SYSCFG_DL_SPI_COMMON_init(void) {
     /* Enable module */
     DL_SPI_enable(SPI_COMMON_INST);
 }
+static const DL_SPI_Config gIOEXP_SPI_config = {
+    .mode        = DL_SPI_MODE_CONTROLLER,
+    .frameFormat = DL_SPI_FRAME_FORMAT_MOTO3_POL0_PHA0,
+    .parity      = DL_SPI_PARITY_NONE,
+    .dataSize    = DL_SPI_DATA_SIZE_8,
+    .bitOrder    = DL_SPI_BIT_ORDER_MSB_FIRST,
+};
+
+static const DL_SPI_ClockConfig gIOEXP_SPI_clockConfig = {
+    .clockSel    = DL_SPI_CLOCK_BUSCLK,
+    .divideRatio = DL_SPI_CLOCK_DIVIDE_RATIO_1
+};
+
+SYSCONFIG_WEAK void SYSCFG_DL_IOEXP_SPI_init(void) {
+    DL_SPI_setClockConfig(IOEXP_SPI_INST, (DL_SPI_ClockConfig *) &gIOEXP_SPI_clockConfig);
+
+    DL_SPI_init(IOEXP_SPI_INST, (DL_SPI_Config *) &gIOEXP_SPI_config);
+
+    /* Configure Controller mode */
+    /*
+     * Set the bit rate clock divider to generate the serial output clock
+     *     outputBitRate = (spiInputClock) / ((1 + SCR) * 2)
+     *     8333333.33 = (100.00 MHz)/((1 + 5) * 2)
+     */
+    DL_SPI_setBitRateSerialClockDivider(IOEXP_SPI_INST, 5);
+    /* Set RX and TX FIFO threshold levels */
+    DL_SPI_setFIFOThreshold(IOEXP_SPI_INST, DL_SPI_RX_FIFO_LEVEL_1_2_FULL, DL_SPI_TX_FIFO_LEVEL_1_2_EMPTY);
+
+    /* Enable module */
+    DL_SPI_enable(IOEXP_SPI_INST);
+}
+
+static const DL_I2CC_ClockConfig gUSER_I2CClockConfig = {
+    .clockSel = DL_I2CC_CLOCK_BUSCLK,
+    .divideRatio = DL_I2CC_CLOCK_DIVIDE_1,
+};
+
+SYSCONFIG_WEAK void SYSCFG_DL_USER_I2C_init(void) {
+    DL_I2CC_setClockConfig(USER_I2C_INST,
+        (DL_I2CC_ClockConfig *) &gUSER_I2CClockConfig);
+    DL_I2CC_setDigitalGlitchFilterPulseWidth(USER_I2C_INST,
+        DL_I2CC_DIGITAL_GLITCH_FILTER_WIDTH_CLOCKS_16);
+
+    /* Configure Controller Mode */
+    DL_I2CC_resetTransfer(USER_I2C_INST);
+    /* Set frequency to 100000 Hz*/
+    DL_I2CC_setTimerPeriod(USER_I2C_INST, 99);
+    DL_I2CC_setTXFIFOThreshold(USER_I2C_INST, DL_I2CC_TX_FIFO_LEVEL_1_2_EMPTY);
+    DL_I2CC_setRXFIFOThreshold(USER_I2C_INST, DL_I2CC_RX_FIFO_LEVEL_1_2_FULL);
+    DL_I2CC_disableClockStretching(USER_I2C_INST);
+
+
+    /* Enable module */
+    DL_I2CC_enable(USER_I2C_INST);
+
+}
+static const DL_I2CC_ClockConfig gADS1115_I2CClockConfig = {
+    .clockSel = DL_I2CC_CLOCK_BUSCLK,
+    .divideRatio = DL_I2CC_CLOCK_DIVIDE_1,
+};
+
+SYSCONFIG_WEAK void SYSCFG_DL_ADS1115_I2C_init(void) {
+    DL_I2CC_setClockConfig(ADS1115_I2C_INST,
+        (DL_I2CC_ClockConfig *) &gADS1115_I2CClockConfig);
+
+    /* Configure Controller Mode */
+    DL_I2CC_resetTransfer(ADS1115_I2C_INST);
+    /* Set frequency to 100000 Hz*/
+    DL_I2CC_setTimerPeriod(ADS1115_I2C_INST, 99);
+    DL_I2CC_setTXFIFOThreshold(ADS1115_I2C_INST, DL_I2CC_TX_FIFO_LEVEL_1_2_EMPTY);
+    DL_I2CC_setRXFIFOThreshold(ADS1115_I2C_INST, DL_I2CC_RX_FIFO_LEVEL_1_2_FULL);
+    DL_I2CC_enableClockStretching(ADS1115_I2C_INST);
+
+
+    /* Enable module */
+    DL_I2CC_enable(ADS1115_I2C_INST);
+
+}
+
+
+static const DL_MCAN_InitParams gUSER_CANInitParams= {
+
+/* Initialize MCAN Init parameters.    */
+    .fdMode            = true,
+    .brsEnable         = true,
+    .txpEnable         = false,
+    .efbi              = false,
+    .pxhddisable       = false,
+    .darEnable         = false,
+    .wkupReqEnable     = false,
+    .autoWkupEnable    = false,
+    .emulationEnable   = false,
+    .tdcEnable         = false,
+    .wdcPreload        = 255,
+
+/* Transmitter Delay Compensation parameters. */
+    .tdcConfig.tdcf    = 10,
+    .tdcConfig.tdco    = 6,
+};
+
+
+static const DL_MCAN_MsgRAMConfigParams gUSER_CANMsgRAMConfigParams ={
+
+    /* Standard ID Filter List Start Address. */
+    .flssa                = USER_CAN_INST_MCAN_STD_ID_FILT_START_ADDR,
+    /* List Size: Standard ID. */
+    .lss                  = USER_CAN_INST_MCAN_STD_ID_FILTER_NUM,
+    /* Extended ID Filter List Start Address. */
+    .flesa                = USER_CAN_INST_MCAN_EXT_ID_FILT_START_ADDR,
+    /* List Size: Extended ID. */
+    .lse                  = USER_CAN_INST_MCAN_EXT_ID_FILTER_NUM,
+    /* Tx Buffers Start Address. */
+    .txStartAddr          = USER_CAN_INST_MCAN_TX_BUFF_START_ADDR,
+    /* Number of Dedicated Transmit Buffers. */
+    .txBufNum             = USER_CAN_INST_MCAN_TX_BUFF_SIZE,
+    .txFIFOSize           = 0,
+    /* Tx Buffer Element Size. */
+    .txBufMode            = 0,
+    .txBufElemSize        = DL_MCAN_ELEM_SIZE_64BYTES,
+    /* Tx Event FIFO Start Address. */
+    .txEventFIFOStartAddr = USER_CAN_INST_MCAN_TX_EVENT_START_ADDR,
+    /* Event FIFO Size. */
+    .txEventFIFOSize      = USER_CAN_INST_MCAN_TX_EVENT_SIZE,
+    /* Level for Tx Event FIFO watermark interrupt. */
+    .txEventFIFOWaterMark = 3,
+    /* Rx FIFO0 Start Address. */
+    .rxFIFO0startAddr     = USER_CAN_INST_MCAN_FIFO_0_START_ADDR,
+    /* Number of Rx FIFO elements. */
+    .rxFIFO0size          = USER_CAN_INST_MCAN_FIFO_0_NUM,
+    /* Rx FIFO0 Watermark. */
+    .rxFIFO0waterMark     = 3,
+    .rxFIFO0OpMode        = 0,
+    /* Rx FIFO1 Start Address. */
+    .rxFIFO1startAddr     = USER_CAN_INST_MCAN_FIFO_1_START_ADDR,
+    /* Number of Rx FIFO elements. */
+    .rxFIFO1size          = USER_CAN_INST_MCAN_FIFO_1_NUM,
+    /* Level for Rx FIFO 1 watermark interrupt. */
+    .rxFIFO1waterMark     = 3,
+    /* FIFO blocking mode. */
+    .rxFIFO1OpMode        = 0,
+    /* Rx Buffer Start Address. */
+    .rxBufStartAddr       = USER_CAN_INST_MCAN_RX_BUFF_START_ADDR,
+    /* Rx Buffer Element Size. */
+    .rxBufElemSize        = DL_MCAN_ELEM_SIZE_64BYTES,
+    /* Rx FIFO0 Element Size. */
+    .rxFIFO0ElemSize      = DL_MCAN_ELEM_SIZE_64BYTES,
+    /* Rx FIFO1 Element Size. */
+    .rxFIFO1ElemSize      = DL_MCAN_ELEM_SIZE_64BYTES,
+};
+
+
+
+static const DL_MCAN_BitTimingParams   gUSER_CANBitTimes = {
+    /* Arbitration Baud Rate Pre-scaler. */
+    .nomRatePrescalar   = 3,
+    /* Arbitration Time segment before sample point. */
+    .nomTimeSeg1        = 42,
+    /* Arbitration Time segment after sample point. */
+    .nomTimeSeg2        = 5,
+    /* Arbitration (Re)Synchronization Jump Width Range. */
+    .nomSynchJumpWidth  = 5,
+    /* Data Baud Rate Pre-scaler. */
+    .dataRatePrescalar  = 3,
+    /* Data Time segment before sample point. */
+    .dataTimeSeg1       = 20,
+    /* Data Time segment after sample point. */
+    .dataTimeSeg2       = 2,
+    /* Data (Re)Synchronization Jump Width.   */
+    .dataSynchJumpWidth = 2,
+};
+
+
+SYSCONFIG_WEAK void SYSCFG_DL_USER_CAN_init(void) {
+    DL_MCAN_RevisionId revid_USER_CAN;
+
+    /* Enable module clock (includes stabilization delays) */
+    DL_MCAN_enableModuleClock(USER_CAN_INST);
+
+    /* Get MCANSS Revision ID. */
+    DL_MCAN_getRevisionId(USER_CAN_INST, &revid_USER_CAN);
+
+    /* Wait for Memory initialization to be completed. */
+    while(false == DL_MCAN_isMemInitDone(USER_CAN_INST));
+
+    /* Put MCAN in SW initialization mode. */
+
+    DL_MCAN_setOpMode(USER_CAN_INST, DL_MCAN_OPERATION_MODE_SW_INIT);
+
+    /* Wait till MCAN is not initialized. */
+    while (DL_MCAN_OPERATION_MODE_SW_INIT != DL_MCAN_getOpMode(USER_CAN_INST));
+
+    /* Initialize MCAN module. */
+    DL_MCAN_init(USER_CAN_INST, (DL_MCAN_InitParams *) &gUSER_CANInitParams);
+
+
+    /* Configure Bit timings. */
+    DL_MCAN_setBitTime(USER_CAN_INST, (DL_MCAN_BitTimingParams*) &gUSER_CANBitTimes);
+
+    /* Configure Message RAM Sections */
+    DL_MCAN_msgRAMConfig(USER_CAN_INST, (DL_MCAN_MsgRAMConfigParams*) &gUSER_CANMsgRAMConfigParams);
+
+
+
+    /* Set Extended ID Mask. */
+    DL_MCAN_setExtIDAndMask(USER_CAN_INST, USER_CAN_INST_MCAN_EXT_ID_AND_MASK );
+
+    /* Loopback mode */
+
+    /* Take MCAN out of the SW initialization mode */
+    DL_MCAN_setOpMode(USER_CAN_INST, DL_MCAN_OPERATION_MODE_NORMAL);
+
+    while (DL_MCAN_OPERATION_MODE_NORMAL != DL_MCAN_getOpMode(USER_CAN_INST));
+
+
+}
 
 SYSCONFIG_WEAK void SYSCFG_DL_SYSTICK_init(void)
 {
-    /* Initialize the period to 83.89 ms */
-    DL_SYSTICK_init(16777216);
-    DL_SYSTICK_enableInterrupt();
+    /*
+     * Initializes the SysTick period to 83.89 ms,
+     * enables the interrupt, and starts the SysTick Timer
+     */
+    SysTick_Config(16777216);
 }
 
 SYSCONFIG_WEAK void SYSCFG_DL_INTERRUPT_init(void)
@@ -881,6 +1193,7 @@ SYSCONFIG_WEAK void SYSCFG_DL_INTERRUPT_init(void)
 
     NVIC_EnableIRQ(DMA0_INT);
     NVIC_EnableIRQ(CAPTURE_ECAP0_INT);
+    NVIC_EnableIRQ(USER_TIMER_INT);
     NVIC_EnableIRQ(RS485_UART_INT);
     NVIC_EnableIRQ(USER_UART_INT);
 }

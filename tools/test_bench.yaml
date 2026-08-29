@@ -505,3 +505,574 @@ commands:
           type: uint16
           is_a_list: true
           list_length_field: length
+
+  i2c_configure:
+    id: 0x15
+
+    request:
+      fields:
+        - name: mode
+          type: uint8
+          is_a_list: false
+      
+        - name: address
+          type: uint8
+          is_a_list: false
+
+        - name: timeout_us
+          type: uint32
+          is_a_list: false
+
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false
+    
+  i2c_configure_single_transfer:
+    id: 0x16
+
+    request:
+      fields:
+        - name: write_count
+          type: uint16
+          is_a_list: false
+
+        - name: read_count
+          type: uint16
+          is_a_list: false
+      
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false
+
+  i2c_write_buffer_put:
+    id: 0x17
+
+    request:
+      fields:
+        - name: start_index
+          type: uint16
+          is_a_list: false
+        
+        - name: length
+          type: uint8
+          is_a_list: false
+        
+        - name: payload
+          type: uint8
+          is_a_list: true
+    
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false
+    
+  i2c_read_buffer_get:
+    id: 0x18
+  
+    request:
+      fields:
+        - name: start_index
+          type: uint16
+          is_a_list: false
+
+        - name: length
+          type: uint8
+          is_a_list: false
+    
+    response:
+      fields:
+        - name: length
+          type: uint8
+          is_a_list: false
+        
+        - name: payload
+          type: uint8
+          is_a_list: true
+          list_length_field: length
+
+  i2c_single_transfer:
+    id: 0x19
+
+    request:
+      fields:
+        - name: start
+          type: uint8
+          is_a_list: false
+    
+    response:
+      fields:
+        - name: transfer_status
+          type: uint8
+          is_a_list: false
+
+  i2c_consecutive_transfer_configure:
+    id: 0x1A
+
+    request:
+      fields:
+        - name: number_of_transfers
+          type: uint8
+          is_a_list: false
+        
+        - name: transfer_index
+          type: uint8
+          is_a_list: false
+        
+        - name: read_count
+          type: uint16
+          is_a_list: false
+        
+        - name: write_count
+          type: uint16
+          is_a_list: false
+        
+        - name: pause_time_us
+          type: uint32
+          is_a_list: false
+    
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false
+
+  i2c_consecutive_transfer_write_buffer_put:
+    id: 0x1B
+
+    request:
+      fields:
+        - name: transfer_index
+          type: uint8
+          is_a_list: false
+
+        - name: start_index
+          type: uint16
+          is_a_list: false
+        
+        - name: length
+          type: uint8
+          is_a_list: false
+        
+        - name: payload
+          type: uint8
+          is_a_list: true
+    
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false
+    
+  i2c_consecutive_transfer_read_buffer_get:
+    id: 0x1C
+  
+    request:
+      fields:
+        - name: transfer_index
+          type: uint8
+          is_a_list: false
+
+        - name: start_index
+          type: uint16
+          is_a_list: false
+
+        - name: length
+          type: uint8
+          is_a_list: false
+    
+    response:
+      fields:
+        - name: length
+          type: uint8
+          is_a_list: false
+        
+        - name: payload
+          type: uint8
+          is_a_list: true
+          list_length_field: length
+
+  i2c_consecutive_transfer_start:
+    id: 0x1D
+
+    request:
+      fields:
+        - name: number_of_transfers
+          type: uint8
+          is_a_list: false
+        
+    response:
+      fields:
+        - name: number_of_transfers
+          type: uint8
+          is_a_list: false
+        
+        - name: transfer_status
+          type: uint8
+          is_a_list: true
+          list_length_field: number_of_transfers
+
+  spi_configure:
+    id: 0x1E
+
+    request:
+      fields:
+        - name: bitrate
+          type: uint32
+          is_a_list: false
+        
+        - name: mode
+          type: uint8
+          is_a_list: false
+        
+        - name: bitorder
+          type:  uint8
+          is_a_list: false
+        
+        - name: cs_polarity
+          type: uint8
+          is_a_list: false
+      
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false
+
+  spi_configure_single_transfer:
+    id: 0x1F
+
+    request:
+      fields:
+        - name: transfer_count
+          type: uint16
+          is_a_list: false
+    
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false
+
+  spi_write_buffer_put:
+    id: 0x20
+
+    request:
+      fields:
+        - name: start_index
+          type: uint16
+          is_a_list: false
+        
+        - name: length
+          type: uint8
+          is_a_list: false
+        
+        - name: payload
+          type: uint8
+          is_a_list: true
+    
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false
+    
+  spi_read_buffer_get:
+    id: 0x21
+  
+    request:
+      fields:
+        - name: start_index
+          type: uint16
+          is_a_list: false
+
+        - name: length
+          type: uint8
+          is_a_list: false
+    
+    response:
+      fields:
+        - name: length
+          type: uint8
+          is_a_list: false
+        
+        - name: payload
+          type: uint8
+          is_a_list: true
+          list_length_field: length
+
+  spi_single_transfer:
+    id: 0x22
+
+    request:
+      fields:
+        - name: start
+          type: uint8
+          is_a_list: false
+    
+    response:
+      fields:
+        - name: transfer_status
+          type: uint8
+          is_a_list: false
+
+  spi_consecutive_transfer_configure:
+    id: 0x23
+
+    request:
+      fields:
+        - name: number_of_transfers
+          type: uint8
+          is_a_list: false
+        
+        - name: transfer_index
+          type: uint8
+          is_a_list: false
+        
+        - name: transfer_count
+          type: uint16
+          is_a_list: false
+        
+        - name: pause_time_us
+          type: uint32
+          is_a_list: false
+    
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false
+
+  spi_consecutive_transfer_write_buffer_put:
+    id: 0x24
+
+    request:
+      fields:
+        - name: transfer_index
+          type: uint8
+          is_a_list: false
+
+        - name: start_index
+          type: uint16
+          is_a_list: false
+        
+        - name: length
+          type: uint8
+          is_a_list: false
+        
+        - name: payload
+          type: uint8
+          is_a_list: true
+    
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false
+    
+  spi_consecutive_transfer_read_buffer_get:
+    id: 0x25
+  
+    request:
+      fields:
+        - name: transfer_index
+          type: uint8
+          is_a_list: false
+
+        - name: start_index
+          type: uint16
+          is_a_list: false
+
+        - name: length
+          type: uint8
+          is_a_list: false
+    
+    response:
+      fields:
+        - name: length
+          type: uint8
+          is_a_list: false
+        
+        - name: payload
+          type: uint8
+          is_a_list: true
+          list_length_field: length
+
+  spi_consecutive_transfer_start:
+    id: 0x26
+
+    request:
+      fields:
+        - name: dummy
+          type: uint8
+          is_a_list: false
+        
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false
+
+  gpio_set_pin_state:
+    id: 0x27
+
+    request:
+      fields:
+        - name: pin
+          type: uint8
+          is_a_list: false
+
+        - name: state
+          type: uint8
+          is_a_list: false
+    
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false
+
+  gpio_get_pin_state:
+    id: 0x28
+
+    request:
+      fields:
+        - name: pin
+          type: uint8
+          is_a_list: false
+    
+    response:
+      fields:
+        - name: state
+          type: uint8
+          is_a_list: false
+
+  gpio_write_port:
+    id: 0x29
+  
+    request:
+      fields:
+        - name: value
+          type: uint8
+          is_a_list: false
+    
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false
+    
+  gpio_read_port:
+    id: 0x2A
+
+    request:
+      fields:
+        - name: dummy
+          type: uint8
+          is_a_list: false
+      
+    response:
+      fields:
+        - name: value
+          type: uint8
+          is_a_list: false
+    
+  gpio_pattern_generator_configure:
+    id: 0x2B
+
+    request:
+      fields:
+        - name: length
+          type: uint16
+          is_a_list: false
+          
+        - name: rate
+          type: uint32
+          is_a_list: false
+      
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false
+
+  gpio_pattern_generator_write_output_sample:
+    id: 0x2C
+
+    request:
+      fields:
+        - name: start_index
+          type: uint16
+          is_a_list: false
+        
+        - name: length
+          type: uint8
+          is_a_list: false
+        
+        - name: samples
+          type: uint8
+          is_a_list: true
+      
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false
+
+  gpio_pattern_generator_read_input_sample:
+    id: 0x2D
+
+    request:
+      fields:
+        - name: start_index
+          type: uint16
+          is_a_list: false
+        
+        - name: length
+          type: uint8
+          is_a_list: false
+    
+    response:
+      fields:
+        - name: length
+          type: uint8
+          is_a_list: false
+        
+        - name: samples
+          type: uint8
+          is_a_list: true
+          list_length_field: length
+
+  gpio_pattern_generator_start:
+    id: 0x2E
+
+    request:
+      fields:
+        - name: start
+          type: uint8
+          is_a_list: false
+    
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false
+
+  gpio_pattern_generator_stop:
+    id: 0x2F
+
+    request:
+      fields:
+        - name: stop
+          type: uint8
+          is_a_list: false
+    
+    response:
+      fields:
+        - name: status
+          type: uint8
+          is_a_list: false

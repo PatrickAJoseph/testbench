@@ -10,8 +10,8 @@
 #define SPI_MAX_TRANSFER_COUNT          (1024U)
 #define SPI_MAX_CONSECUTIVE_TRANSFERS   (32U)
 
-static uint8_t SPI_tx_buffer[SPI_MAX_TRANSFER_COUNT];
-static uint8_t SPI_rx_buffer[SPI_MAX_TRANSFER_COUNT];
+uint8_t SPI_tx_buffer[SPI_MAX_TRANSFER_COUNT];
+uint8_t SPI_rx_buffer[SPI_MAX_TRANSFER_COUNT];
 
 struct spi
 {
@@ -20,6 +20,7 @@ struct spi
     int transfer_count;
     int mode;
     bool msb_first;
+    int cs_polarity;
     int frequency;
     int consecutive_transfer_count;
 };
@@ -32,8 +33,8 @@ struct spi_consecutive_transfer
     clock_t pause_time_us;
 };
 
-static struct spi user_spi;
-static struct spi_consecutive_transfer user_spi_consecutive_transfers[SPI_MAX_CONSECUTIVE_TRANSFERS];
+struct spi user_spi;
+struct spi_consecutive_transfer user_spi_consecutive_transfers[SPI_MAX_CONSECUTIVE_TRANSFERS];
 
 void SPI_transfer_internal(uint8_t* tx_buffer, uint8_t* rx_buffer, size_t count)
 {
@@ -47,7 +48,7 @@ void SPI_transfer_internal(uint8_t* tx_buffer, uint8_t* rx_buffer, size_t count)
     rx_count = (int)count;
     tx_count = (int)count;
 
-    DL_GPIO_clearPins(SPI_GPIO_GROUP_PORT, SPI_GPIO_GROUP_SPI_CS_USER_0_PIN);
+    (user_spi.cs_polarity == SPI_CS_POLARITY_ACTIVE_LOW) ? DL_GPIO_clearPins(SPI_GPIO_GROUP_PORT, SPI_GPIO_GROUP_SPI_CS_USER_0_PIN) : DL_GPIO_setPins(SPI_GPIO_GROUP_PORT, SPI_GPIO_GROUP_SPI_CS_USER_0_PIN);
 
     while(rx_count)
     {
@@ -79,7 +80,7 @@ void SPI_transfer_internal(uint8_t* tx_buffer, uint8_t* rx_buffer, size_t count)
 
     while(DL_SPI_isBusy(SPI_COMMON_INST));
 
-    DL_GPIO_setPins(SPI_GPIO_GROUP_PORT, SPI_GPIO_GROUP_SPI_CS_USER_0_PIN);
+    (user_spi.cs_polarity == SPI_CS_POLARITY_ACTIVE_HIGH) ? DL_GPIO_clearPins(SPI_GPIO_GROUP_PORT, SPI_GPIO_GROUP_SPI_CS_USER_0_PIN) : DL_GPIO_setPins(SPI_GPIO_GROUP_PORT, SPI_GPIO_GROUP_SPI_CS_USER_0_PIN);
 }
 
 static DL_SPI_Config USER_SPI_config = {
@@ -159,6 +160,11 @@ void SPI_set_mode(int mode)
 {
     user_spi.mode = mode;
     SPI_configure();
+}
+
+void SPI_set_cs_polarity(int polarity)
+{
+    user_spi.cs_polarity = polarity;
 }
 
 void SPI_set_bit_order(int bit_order)

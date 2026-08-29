@@ -19,6 +19,9 @@
 
 #include "pwm.h"
 #include "user_uart.h"
+#include "user_i2c.h"
+#include "user_spi.h"
+#include "user_gpio.h"
 #include "capture.h"
 #include "hsadc.h"
 
@@ -97,6 +100,33 @@ static void capture_get_data(struct protocol_context* context);
 static void hsadc_configure(struct protocol_context* context);
 static void hsadc_control(struct protocol_context* context);
 static void hsadc_get_samples(struct protocol_context* context);
+static void i2c_configure(struct protocol_context* context);
+static void i2c_configure_single_transfer(struct protocol_context* context);
+static void i2c_write_buffer_put(struct protocol_context* context);
+static void i2c_read_buffer_get(struct protocol_context* context);
+static void i2c_single_transfer(struct protocol_context* context);
+static void i2c_consecutive_transfer_configure(struct protocol_context* context);
+static void i2c_consecutive_transfer_write_buffer_put(struct protocol_context* context);
+static void i2c_consecutive_transfer_read_buffer_get(struct protocol_context* context);
+static void i2c_consecutive_transfer_start(struct protocol_context* context);
+static void spi_configure(struct protocol_context* context);
+static void spi_configure_single_transfer(struct protocol_context* context);
+static void spi_write_buffer_put(struct protocol_context* context);
+static void spi_read_buffer_get(struct protocol_context* context);
+static void spi_single_transfer(struct protocol_context* context);
+static void spi_consecutive_transfer_configure(struct protocol_context* context);
+static void spi_consecutive_transfer_write_buffer_put(struct protocol_context* context);
+static void spi_consecutive_transfer_read_buffer_get(struct protocol_context* context);
+static void spi_consecutive_transfer_start(struct protocol_context* context);
+static void gpio_set_pin_state(struct protocol_context* context);
+static void gpio_get_pin_state(struct protocol_context* context);
+static void gpio_write_port(struct protocol_context* context);
+static void gpio_read_port(struct protocol_context* context);
+static void gpio_pattern_generator_configure(struct protocol_context* context);
+static void gpio_pattern_generator_write_output_sample(struct protocol_context* context);
+static void gpio_pattern_generator_read_input_sample(struct protocol_context* context);
+static void gpio_pattern_generator_start(struct protocol_context* context);
+static void gpio_pattern_generator_stop(struct protocol_context* context);
 
 /* Define the command list over here */
 
@@ -119,9 +149,36 @@ static const protocol_app_callback_list_element_t protocol_app_if_callback_list[
  { .command = 0x0F, .callback = uart_consecutive_transfer_instance_read_bytes },
  { .command = 0x10, .callback = capture_control },
  { .command = 0x11, .callback = capture_get_data },
-{ .command = 0x12, .callback = hsadc_configure },
-{ .command = 0x13, .callback = hsadc_control },
-{ .command = 0x14, .callback = hsadc_get_samples },
+ { .command = 0x12, .callback = hsadc_configure },
+ { .command = 0x13, .callback = hsadc_control },
+ { .command = 0x14, .callback = hsadc_get_samples },
+ { .command = 0x15, .callback = i2c_configure },
+ { .command = 0x16, .callback = i2c_configure_single_transfer },
+ { .command = 0x17, .callback = i2c_write_buffer_put, },
+ { .command = 0x18, .callback = i2c_read_buffer_get, },
+ { .command = 0x19, .callback = i2c_single_transfer, },
+ { .command = 0x1A, .callback = i2c_consecutive_transfer_configure, },
+ { .command = 0x1B, .callback = i2c_consecutive_transfer_write_buffer_put, },
+ { .command = 0x1C, .callback = i2c_consecutive_transfer_read_buffer_get, },
+ { .command = 0x1D, .callback = i2c_consecutive_transfer_start, },
+ { .command = 0x1E, .callback = spi_configure, },
+ { .command = 0x1F, .callback = spi_configure_single_transfer, },
+ { .command = 0x20, .callback = spi_write_buffer_put, },
+ { .command = 0x21, .callback = spi_read_buffer_get, },
+ { .command = 0x22, .callback = spi_single_transfer, },
+ { .command = 0x23, .callback = spi_consecutive_transfer_configure, },
+ { .command = 0x24, .callback = spi_consecutive_transfer_write_buffer_put, },
+ { .command = 0x25, .callback = spi_consecutive_transfer_read_buffer_get, },
+ { .command = 0x26, .callback = spi_consecutive_transfer_start, },
+ { .command = 0x27, .callback = gpio_set_pin_state, },
+ { .command = 0x28, .callback = gpio_get_pin_state, },
+ { .command = 0x29, .callback = gpio_write_port, },
+ { .command = 0x2A, .callback = gpio_read_port, },
+ { .command = 0x2B, .callback = gpio_pattern_generator_configure, },
+ { .command = 0x2C, .callback = gpio_pattern_generator_write_output_sample, },
+ { .command = 0x2D, .callback = gpio_pattern_generator_read_input_sample, },
+ { .command = 0x2E, .callback = gpio_pattern_generator_start, },
+ { .command = 0x2F, .callback = gpio_pattern_generator_stop, },
  { .command = 0x00, .callback = NULL },
 };
 
@@ -792,4 +849,517 @@ static void hsadc_get_samples(struct protocol_context* context)
         current_sample = HSADC_get_sample(channel, start_index + index);
         PROTOCOL_WRITE_UINT16( context, current_sample, (2*index + 1) );
     }
+}
+
+/**
+ *  @brief      Configures the USER I2C interface. Sets the mode and the I2C address.
+ *
+ */
+
+static void i2c_configure(struct protocol_context* context)
+{
+    uint8_t mode;
+    uint8_t address;
+    uint8_t status;
+    uint32_t timeout;
+
+    status = 0;
+
+    mode = context->payload[0];
+    address = context->payload[1];
+    PROTOCOL_READ_UINT32( context, &timeout, 2 );
+
+    if(address > 0x7F)
+    {
+        status = 1;
+    }
+    else 
+    {
+        I2C_set_mode(mode);
+        I2C_set_address(address);
+        I2C_set_transfer_timeout_us(timeout);
+    }
+
+    protocol_set_response_payload_length(context, 1);
+
+    context->payload[0] = status;
+}
+
+static void i2c_configure_single_transfer(struct protocol_context* context)
+{
+    uint16_t write_count;
+    uint16_t read_count;
+
+    PROTOCOL_READ_UINT16(context, &write_count, 0);
+    PROTOCOL_READ_UINT16(context, &read_count, 2);
+
+    I2C_set_read_count(read_count);
+    I2C_set_write_count(write_count);
+
+    protocol_set_response_payload_length(context, 1);
+
+    context->payload[0] = 0;
+}
+
+static void i2c_write_buffer_put(struct protocol_context* context)
+{
+    int start_index;
+    int length;
+    uint8_t* payload;
+    int index;
+
+    PROTOCOL_READ_UINT16( context, ((uint16_t*)&start_index), 0);
+
+    length = (int)context->payload[2];
+    payload = &context->payload[3];
+
+    for(index = 0; index < length; index++)
+    {
+        I2C_write_buffer_put_byte(payload[index], start_index + index);
+    }
+
+    protocol_set_response_payload_length(context, 1);
+    context->payload[0] = 0;
+}
+
+static void i2c_read_buffer_get(struct protocol_context* context)
+{
+    int start_index;
+    int length;
+    int index;
+
+    PROTOCOL_READ_UINT16( context, ((uint16_t*)&start_index), 0);
+
+    length = (int)context->payload[2];
+
+    for(index = 0; index < length; index++)
+    {
+        context->payload[index + 1] = I2C_read_buffer_get_byte(start_index + index);
+    }
+
+    protocol_set_response_payload_length(context, length + 1);
+    context->payload[0] = length;   
+}
+
+static void i2c_single_transfer(struct protocol_context* context)
+{
+    uint8_t start;
+    uint8_t status;
+
+    start = context->payload[0];
+
+    if(start)
+    {
+        I2C_transfer_start();
+    }
+
+    status = I2C_transfer_status();
+
+    protocol_set_response_payload_length(context, 1);
+
+    context->payload[0] = status;
+}
+
+static void i2c_consecutive_transfer_configure(struct protocol_context* context)
+{
+    uint8_t number_of_transfers;
+    uint8_t transfer_index;
+    uint16_t transfer_read_count;
+    uint16_t transfer_write_count;
+    uint32_t pause_time_us;
+
+    number_of_transfers = context->payload[0];
+    transfer_index = context->payload[1];
+    PROTOCOL_READ_UINT16( context, &transfer_read_count, 2 );
+    PROTOCOL_READ_UINT16( context, &transfer_write_count, 4 );
+    PROTOCOL_READ_UINT32( context, &pause_time_us, 6 );
+
+    I2C_consecutive_transfer_set_count(number_of_transfers);
+    I2C_consecutive_transfer_set_read_count(transfer_index, transfer_read_count);
+    I2C_consecutive_transfer_set_write_count(transfer_index, transfer_write_count);
+    I2C_consecutive_transfer_set_pause_time_us(transfer_index, pause_time_us);
+
+    protocol_set_response_payload_length(context, 1);
+
+    context->payload[0] = 0;
+}
+
+static void i2c_consecutive_transfer_write_buffer_put(struct protocol_context* context)
+{
+    int transfer_index;
+    int start_index;
+    int length;
+    uint8_t* payload;
+    int index;
+
+    transfer_index = (int)context->payload[0];
+
+    PROTOCOL_READ_UINT16( context, ((uint16_t*)&start_index), 1);
+
+    length = (int)context->payload[3];
+    payload = &context->payload[4];
+
+    for(index = 0; index < length; index++)
+    {
+        I2C_consecutive_transfer_write_buffer_put(transfer_index, payload[index], start_index + index);
+    }
+
+    protocol_set_response_payload_length(context, 1);
+    context->payload[0] = 0;
+}
+
+static void i2c_consecutive_transfer_read_buffer_get(struct protocol_context* context)
+{
+    int transfer_index;
+    int start_index;
+    int length;
+    int index;
+
+    transfer_index = (int)context->payload[0];
+
+    PROTOCOL_READ_UINT16( context, ((uint16_t*)&start_index), 1);
+
+    length = (int)context->payload[3];
+
+    for(index = 0; index < length; index++)
+    {
+        context->payload[index + 1] = I2C_consecutive_transfer_read_buffer_get(transfer_index, start_index + index);
+    }
+
+    protocol_set_response_payload_length(context, length + 1);
+    context->payload[0] = length;
+}
+
+static void i2c_consecutive_transfer_start(struct protocol_context* context)
+{
+    int number_of_transfers;
+    int index;
+
+    number_of_transfers = (int)context->payload[0];
+
+    I2C_consecutive_transfer_start();
+
+    for( index = 0 ; index < number_of_transfers ; index++ )
+    {
+        context->payload[index + 1] = I2C_consecutive_transfer_status(index);
+    }
+
+    protocol_set_response_payload_length(context, number_of_transfers + 1);
+}
+
+static void spi_configure(struct protocol_context* context)
+{
+    uint32_t bitrate;
+    uint32_t mode;
+    uint32_t order;
+    uint32_t cs_polarity;
+
+    PROTOCOL_READ_UINT32( context, &bitrate, 0 );
+    mode = (uint32_t)context->payload[4];
+    order = (uint32_t)context->payload[5];
+    cs_polarity = (uint32_t)context->payload[6];
+
+    SPI_set_bit_order(order);
+    SPI_set_bitrate(bitrate);
+    SPI_set_mode(mode);
+    SPI_set_cs_polarity(cs_polarity);
+
+    protocol_set_response_payload_length(context, 1);
+
+    context->payload[0] = 0;
+}
+
+static void spi_configure_single_transfer(struct protocol_context* context)
+{
+    uint16_t transfer_count;
+
+    PROTOCOL_READ_UINT16(context, &transfer_count, 0);
+
+    SPI_set_transfer_count(transfer_count);
+
+    protocol_set_response_payload_length(context, 1);
+
+    context->payload[0] = 0;
+}
+
+static void spi_write_buffer_put(struct protocol_context* context)
+{
+    int start_index;
+    int length;
+    uint8_t* payload;
+    int index;
+
+    PROTOCOL_READ_UINT16( context, ((uint16_t*)&start_index), 0);
+
+    length = (int)context->payload[2];
+    payload = &context->payload[3];
+
+    for(index = 0; index < length; index++)
+    {
+        SPI_write_buffer_put(payload[index], start_index + index);
+    }
+
+    protocol_set_response_payload_length(context, 1);
+    context->payload[0] = 0;
+}
+
+static void spi_read_buffer_get(struct protocol_context* context)
+{
+    int start_index;
+    int length;
+    int index;
+
+    PROTOCOL_READ_UINT16( context, ((uint16_t*)&start_index), 0);
+
+    length = (int)context->payload[2];
+
+    for(index = 0; index < length; index++)
+    {
+        context->payload[index + 1] = SPI_read_buffer_get(start_index + index);
+    }
+
+    protocol_set_response_payload_length(context, length + 1);
+    context->payload[0] = length;   
+}
+
+static void spi_single_transfer(struct protocol_context* context)
+{
+    uint8_t start;
+
+    start = context->payload[0];
+
+    if(start)
+    {
+        SPI_start_transfer();
+    }
+
+    protocol_set_response_payload_length(context, 1);
+
+    context->payload[0] = 0;
+}
+
+static void spi_consecutive_transfer_configure(struct protocol_context* context)
+{
+    uint8_t number_of_transfers;
+    uint8_t transfer_index;
+    uint16_t transfer_count;
+    uint32_t pause_time_us;
+
+    number_of_transfers = context->payload[0];
+    transfer_index = context->payload[1];
+    PROTOCOL_READ_UINT16( context, &transfer_count, 2 );
+    PROTOCOL_READ_UINT32( context, &pause_time_us, 4 );
+
+    SPI_consecutive_transfer_set_count(number_of_transfers);
+    SPI_consecutive_transfer_set_transfer_count(transfer_index, transfer_count);
+    SPI_consecutive_transfer_set_pause_interval(transfer_index, pause_time_us);
+
+    protocol_set_response_payload_length(context, 1);
+
+    context->payload[0] = 0;
+}
+
+static void spi_consecutive_transfer_write_buffer_put(struct protocol_context* context)
+{
+    int transfer_index;
+    int start_index;
+    int length;
+    uint8_t* payload;
+    int index;
+
+    transfer_index = (int)context->payload[0];
+
+    PROTOCOL_READ_UINT16( context, ((uint16_t*)&start_index), 1);
+
+    length = (int)context->payload[3];
+    payload = &context->payload[4];
+
+    for(index = 0; index < length; index++)
+    {
+        SPI_consecutive_transfer_write_byte(transfer_index, payload[index], start_index + index);
+    }
+
+    protocol_set_response_payload_length(context, 1);
+    context->payload[0] = 0;
+}
+
+static void spi_consecutive_transfer_read_buffer_get(struct protocol_context* context)
+{
+    int transfer_index;
+    int start_index;
+    int length;
+    int index;
+
+    transfer_index = (int)context->payload[0];
+
+    PROTOCOL_READ_UINT16( context, ((uint16_t*)&start_index), 1);
+
+    length = (int)context->payload[3];
+
+    for(index = 0; index < length; index++)
+    {
+        context->payload[index + 1] = SPI_consecutive_transfer_read_byte(transfer_index, start_index + index);
+    }
+
+    protocol_set_response_payload_length(context, length + 1);
+    context->payload[0] = length;
+}
+
+static void spi_consecutive_transfer_start(struct protocol_context* context)
+{
+    int dummy;
+
+    (void)dummy;
+
+    dummy = (int)context->payload[0];
+
+    SPI_consecutive_transfer_start();
+
+    protocol_set_response_payload_length(context, 1);
+
+    context->payload[0] = 0;
+}
+
+static void gpio_set_pin_state(struct protocol_context* context)
+{
+    int pin;
+    bool state;
+
+    pin = (int)context->payload[0];
+    state = (bool)context->payload[1];
+
+    GPIO_set_output_state(pin, state);
+
+    protocol_set_response_payload_length(context, 1);
+
+    context->payload[0] = 0;
+}
+
+static void gpio_get_pin_state(struct protocol_context* context)
+{
+    int pin;
+    bool state;
+
+    pin = (int)context->payload[0];
+
+    state = GPIO_get_input_state(pin);
+
+    protocol_set_response_payload_length(context, 1);
+
+    context->payload[0] = (uint8_t)state;
+}
+
+static void gpio_write_port(struct protocol_context* context)
+{
+    uint8_t port;
+
+    port = (uint8_t)context->payload[0];
+
+    GPIO_write_port(port);
+
+    protocol_set_response_payload_length(context, 1);
+
+    context->payload[0] = 0;
+}
+
+static void gpio_read_port(struct protocol_context* context)
+{
+    uint8_t port;
+
+    port = GPIO_read_port();
+
+    protocol_set_response_payload_length(context, 1);
+
+    context->payload[0] = port;
+}
+
+static void gpio_pattern_generator_configure(struct protocol_context* context)
+{
+    uint16_t pattern_length;
+    uint32_t pattern_generation_rate;
+
+    PROTOCOL_READ_UINT16( context, &pattern_length, 0 );
+    PROTOCOL_READ_UINT32( context, &pattern_generation_rate, 2 );
+
+    GPIO_set_pattern_generation_length(pattern_length);
+    GPIO_set_pattern_generation_rate(pattern_generation_rate);
+
+    protocol_set_response_payload_length(context, 1);
+
+    context->payload[0] = 0;
+}
+
+static void gpio_pattern_generator_write_output_sample(struct protocol_context* context)
+{
+    int start_index;
+    int length;
+    int index;
+    uint8_t* pattern;
+    
+    PROTOCOL_READ_UINT16( context, ((uint16_t*)&start_index), 0 );
+
+    length = (uint8_t)context->payload[2];
+
+    pattern = &context->payload[3];
+
+    for( index = 0 ; index < length ; index++ )
+    {
+        GPIO_set_output_pattern_at_index( start_index + index, pattern[index] );
+    }
+
+    protocol_set_response_payload_length(context, 1);
+
+    context->payload[0] = 0;
+}
+
+static void gpio_pattern_generator_read_input_sample(struct protocol_context* context)
+{
+    int start_index;
+    int length;
+    int index;
+    
+    PROTOCOL_READ_UINT16( context, ((uint16_t*)&start_index), 0 );
+
+    length = (int)context->payload[2];
+
+    protocol_set_response_payload_length(context, (length + 1));
+
+    context->payload[0] = (uint8_t)length;
+
+    for( index = 0 ; index < length ; index++ )
+    {
+        context->payload[index + 1] = GPIO_get_input_pattern_at_index(start_index + index);
+    }
+}
+
+static void gpio_pattern_generator_start(struct protocol_context* context)
+{
+    bool start;
+
+    start = (bool)context->payload[0];
+
+    if(start)
+    {
+        GPIO_pattern_generation_start();
+    }
+
+    protocol_set_response_payload_length(context, 1);
+
+    context->payload[0] = 0;
+}
+
+static void gpio_pattern_generator_stop(struct protocol_context* context)
+{
+    bool stop;
+
+    stop = (bool)context->payload[0];
+
+    if(stop)
+    {
+        GPIO_pattern_generation_stop();
+    }
+
+    protocol_set_response_payload_length(context, 1);
+
+    context->payload[0] = 0;
 }
